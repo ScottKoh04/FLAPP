@@ -1,0 +1,67 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+
+
+  <!-- Main Section -->
+  <main class="projects">
+    <section class="hero-section text-center">
+      <div class="container container--narrow">
+        <div class="hero-section__box">
+          <h2>Search for Individual <span>Orders</span></h2>
+        </div>
+
+        <div class="hero-section__search">
+          <form id='searchForm' class="form" action="{% url 'orders' %}" method="get">
+            <div class="form__field">
+              <label for="formInput#search">Search By Customer name </label>
+              <input class="input input--text" id="formInput#search" type="text" name="search_query"
+                value="{{ search_query }}"
+                     placeholder="Search by Customer name" />
+            </div>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <br>
+      <h1 class="btn btn--sub btn--lg" type="button" value="ADD ORDER"><a href="{% url 'create-order' %}">ADD ORDER</a></h1>
+    <br>
+  <br>
+
+      <br/><br/>
+      <table class="table">
+  <thead>
+    <tr>
+      <th>Transaction Time</th>
+      <th>Customer Name</th>
+      <th>Product</th>
+      <th>Weight</th>
+        <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+                <tr>
+                    <td>{{ order.transactionTime }}</td>
+                    <td>{{ order.customer }}</td>
+                    <td>{{ order.product }}</td>
+                    <td>{{ order.weight }}</td>
+                    <td>{{ order.subtotal}}</td>
+                    <td><a href="{% url 'retrieve-order' order.id %}">View</a></td>
+                    <td><a href="{% url 'update-order' order.id %}">Edit</a></td>
+                    <td><a href="{% url 'delete-order' order.id %}">Delete</a></td>
+                </tr>
+            {% endfor %}
+  </tbody>
+</table>
+
+    {% include 'pagination.html' with queryset=orders custom_range=custom_range %}
+
+</main>
+
+
+{% endblock content %}

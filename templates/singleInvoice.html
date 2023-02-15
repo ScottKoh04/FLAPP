@@ -1,0 +1,84 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <br>
+      <table class="table table-borderless">
+    <tr>
+        <td>image here</td>
+      <td>Fong Lim Enterprise</td>
+      <td>Invoice</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+      <td>Address: </td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+      <td>Email: </td>
+      <td>Invoice No: {{invoice.id}}</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+      <td>Phone: </td>
+      <td>&nbsp;</td>
+    </tr>
+  <tr>
+        <td>Customer Name: {{ invoice.customer }}</td>
+      <td>&nbsp;</td>
+      <td>Date: {{ invoice.timeGenerated.date}}</td>
+    </tr>
+  <tr>
+      <td>Delivery Address: {{ invoice.customer.companyAddress}}</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+      </table>
+
+    <br>
+
+    <table class="table table-striped table-hover table-bordered">
+    <tr>
+        <td>Quantity</td>
+        <td>Code</td>
+        <td>Description</td>
+        <td>Unit Price</td>
+        <td>Subtotal</td>
+    </tr>
+        <!--loop through all orders in invoice-->
+{% for order in orders %}
+                <tr>
+                    <td>{{ order.weight }}</td>
+                    <td>{{ order.product.grade }}</td>
+                    <td>{{ order.product }}</td>
+                    <td>{{ order.product.unitPrice }}</td>
+                    <td>{{ order.subtotal}}</td>
+                    </tr>
+            {% endfor %}
+        <!-- end loop -->
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="">Grand Total: </td>
+        <td>{{ invoice.grandTotal }}</td>
+    </tr>
+    </table>
+
+<br>
+    <br>
+    <br>
+
+    <table class="table table-borderless">
+    <tr>
+        <td>_______</td>
+        <td>_______</td>
+        <td>_______</td>
+    </tr>
+    <tr>
+        <td>Issued by</td>
+        <td>Company Chop</td>
+        <td>Manager/ Director</td>
+    </tr>
+    </table>
+{% endblock %}

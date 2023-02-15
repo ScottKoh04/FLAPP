@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<br>
+    <h1>Products</h1>
+<br>
+    <table class="table table-striped table-hover table-bordered">
+        <tr>
+            <th>Product</th>
+            <th>Grade</th>
+            <th>Tier</th>
+            <th>Unit Price</th>
+        </tr>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.productName }}</td>
+                <td>{{ product.grade }}</td>
+                <td>{{ product.tier }}</td>
+                <td>{{ product.unitPrice }}</td>
+                <td><a href="{% url 'update-product' product.id %}">Edit</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <h1 class="btn btn--sub btn--lg" type="button" value="ADD PRODUCT"><a href="{% url 'create-product' %}">ADD PRODUCT</a></h1>
+
+{% endblock content %}

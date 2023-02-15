@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+
+
+        <button onclick="history.back()">Cancel</button>
+        <input type="submit" value="Confirm"/>
+
+    </form>
+{% endblock %}

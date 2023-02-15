@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<table>
+    <tr>
+        <td><a href="{% url 'orders' %}">CREATE ORDER</a></td>
+        <td><a href="{% url 'invoices' %}">INVOICES</a></td>
+    </tr>
+
+    <tr>
+         <td><a href="{% url 'customers' %}">CUSTOMERS</a></td>
+         <td><a href="{% url 'products' %}">PRODUCTS</a></td>
+         <td><a href="{% url 'admin:index' %}">ADMIN</a></td>
+    </tr>
+</table>
+
+{% endblock %}

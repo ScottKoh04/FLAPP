@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<a href={% url 'generateInvoices' %}>Generate New Invoice</a>
+<table class="table table-striped table-hover table-bordered">
+  <thead>
+    <tr>
+      <th>Invoice No.</th>
+      <th>Customer</th>
+      <th>Time Generated</th>
+        <th>Summary</th>
+        <th>Grand Total</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.id }}</td>
+                    <td>{{ invoice.customer }}</td>
+                    <td>{{ invoice.timeGenerated }}</td>
+                    <td>{{ invoice.summary }}</td>
+                    <td>{{ invoice.grandTotal }}</td>
+                    <td><a href="{% url 'pdf_view' invoice.pk %}">View PDF</a></td>
+                </tr>
+            {% endfor %}
+  </tbody>
+</table>
+    
+{% endblock %}
