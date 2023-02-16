@@ -93,10 +93,9 @@ def orders(request):
 
 
 def invoices(request):
-    invoices = Invoice.objects.all()
-    orders = Order.objects.all()
-
-    context = {'orders': orders, 'invoices': invoices}
+    invoices, search_query = searchItems(request, 'search_invoice')
+    custom_range, invoices = paginateItems(request, invoices)
+    context = {'invoices': invoices, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'invoices.html', context)
 
 '''

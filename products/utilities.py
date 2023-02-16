@@ -36,6 +36,13 @@ def searchItems(request, search_type):
         )
         return products, search_query
 
+    elif search_type == 'search_invoice':
+        invoices = Invoice.objects.distinct().filter(
+            Q(customer__firstname__icontains=search_query) |
+            Q(customer__companyName__icontains=search_query)
+        )
+        return invoices, search_query
+
 
 def paginateItems(request, items):
     page = request.GET.get('page')

@@ -1,15 +1,39 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<a href={% url 'generateInvoices' %}>Generate New Invoice</a>
+<main class="projects">
+  <section class="hero-section text-center">
+    <div class="container container--narrow">
+      <div class="hero-section__box">
+        <h2>Search <span>Invoices</span></h2>
+      </div>
+
+      <div class="hero-section__search">
+        <form id='searchForm' class="form" action="{% url 'invoices' %}" method="get">
+          <div class="form__field">
+            <label for="formInput#search">Search By Customer or Company</label>
+            <input class="input input--text" id="formInput#search" type="text" name="search_query"
+              value="{{ search_query }}"
+                   placeholder="Search by Customer or Company" />
+          </div>
+
+          <input class="btn btn--sub btn--lg" type="submit" value="Search" /><h1 class="btn btn--sub btn--lg" type="button" value="ADD INVOICES"><a href="{% url 'generateInvoices' %}">+ New</a></h1>
+        </form>
+      </div>
+    </div>
+  </section>
+
+    <br>
+
 <table class="table table-striped table-hover table-bordered">
   <thead>
     <tr>
       <th>Invoice No.</th>
+      <th>Date</th>
       <th>Customer</th>
-      <th>Time Generated</th>
-        <th>Summary</th>
-        <th>Grand Total</th>
+      <th>Company Name</th>
+      <!--<th>Summary</th>-->
+      <th>Grand Total</th>
 
     </tr>
   </thead>
@@ -17,14 +41,15 @@
     {% for invoice in invoices %}
                 <tr>
                     <td>{{ invoice.id }}</td>
-                    <td>{{ invoice.customer }}</td>
                     <td>{{ invoice.timeGenerated }}</td>
-                    <td>{{ invoice.summary }}</td>
+                    <td>{{ invoice.customer }}</td>
+                    <td>{{ invoice.customer.companyName }}</td>
+                    <!--<td>{{ invoice.summary }}</td>-->
                     <td>{{ invoice.grandTotal }}</td>
                     <td><a href="{% url 'pdf_view' invoice.pk %}">View PDF</a></td>
                 </tr>
             {% endfor %}
   </tbody>
 </table>
-    
+</main>
 {% endblock %}
