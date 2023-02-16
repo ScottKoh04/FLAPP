@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
-from .utilities import searchOrders, paginateOrders
+from .utilities import searchItems, paginateItems
 from .filters import OrderFilter
 from django.template import RequestContext
 
@@ -53,8 +53,9 @@ def home(request):
 
 @login_required(login_url='login')
 def products(request):
-    products = Product.objects.all()
-    context = {'products':products}
+    products, search_query = searchItems(request, 'search_product')
+    custom_range, products = paginateItems(request, products)
+    context = {'products': products, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'products.html', context)
 @login_required(login_url='login')
 def createProduct(request):
@@ -85,8 +86,8 @@ def updateProduct(request, pk):
 
 @login_required(login_url='login')
 def orders(request):
-    orders, search_query = searchOrders(request)
-    custom_range, orders = paginateOrders(request, orders)
+    orders, search_query = searchItems(request, 'search_order')
+    custom_range, orders = paginateItems(request, orders)
     context = {'orders': orders, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'orders.html', context)
 
@@ -256,8 +257,9 @@ def generateInvoices(request):
 
 @login_required(login_url='login')
 def customers(request):
-    customers = Customer.objects.all()
-    context = {'customers': customers}
+    customers, search_query = searchItems(request, 'search_customer')
+    custom_range, customers = paginateItems(request, customers)
+    context = {'customers': customers, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'customers.html', context)
 @login_required(login_url='login')
 def createCustomer(request):

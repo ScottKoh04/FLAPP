@@ -12,10 +12,6 @@
   <link rel="stylesheet" href="{% static 'uikit/styles/uikit.css' %}" />
   <link rel="stylesheet" href="{% static 'styles/app.css' %}" />
 
-    <!-- bootstrap -->
-
-    <title>Foong Lim Enterprise!</title>
-
 </head>
 
 <body>
@@ -34,6 +30,8 @@
     {% block content %}
 
     {% endblock content %}
+
+    {% include 'footer.html' %}
 </body>
 
 <script src="{% static 'uikit/app.js' %}"></script>

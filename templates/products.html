@@ -1,9 +1,30 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<main class="projects">
+    <section class="hero-section text-center">
+    <div class="container container--narrow">
+      <div class="hero-section__box">
+        <h2>Search <span>Products</span></h2>
+      </div>
+
+      <div class="hero-section__search">
+        <form id='searchForm' class="form" action="{% url 'products' %}" method="get">
+          <div class="form__field">
+            <label for="formInput#search">Search By Product name </label>
+            <input class="input input--text" id="formInput#search" type="text" name="search_query"
+              value="{{ search_query }}"
+                   placeholder="Search by Product name" />
+          </div>
+
+          <input class="btn btn--sub btn--lg" type="submit" value="Search" /><h1 class="btn btn--sub btn--lg" type="button" value="ADD PRODUCT"><a href="{% url 'create-product' %}">+ New</a></h1>
+
+        </form>
+      </div>
+    </div>
+  </section>
 <br>
-    <h1>Products</h1>
-<br>
+
     <table class="table table-striped table-hover table-bordered">
         <tr>
             <th>Product</th>
@@ -22,6 +43,8 @@
         {% endfor %}
     </table>
     <br>
-    <h1 class="btn btn--sub btn--lg" type="button" value="ADD PRODUCT"><a href="{% url 'create-product' %}">ADD PRODUCT</a></h1>
 
+        {% include 'pagination.html' with queryset=products custom_range=custom_range %}
+
+</main>
 {% endblock content %}

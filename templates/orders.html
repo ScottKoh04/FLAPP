@@ -9,7 +9,7 @@
     <section class="hero-section text-center">
       <div class="container container--narrow">
         <div class="hero-section__box">
-          <h2>Search for Individual <span>Orders</span></h2>
+          <h2>Search <span>Orders</span></h2>
         </div>
 
         <div class="hero-section__search">
@@ -21,18 +21,17 @@
                      placeholder="Search by Customer name" />
             </div>
 
-            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+              <input class="btn btn--sub btn--lg" type="submit" value="Search" /><h1 class="btn btn--sub btn--lg" type="button" value="ADD ORDER"><a href="{% url 'create-order' %}">+ New</a></h1>
+
           </form>
         </div>
       </div>
     </section>
 
     <br>
-      <h1 class="btn btn--sub btn--lg" type="button" value="ADD ORDER"><a href="{% url 'create-order' %}">ADD ORDER</a></h1>
-    <br>
-  <br>
 
-      <br/><br/>
+    <br>
+
       <table class="table">
   <thead>
     <tr>
