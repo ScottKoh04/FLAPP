@@ -1,5 +1,7 @@
+{% load static %}
+
+
 <head>
-    {% load bootstrap5 %}
 
 <style>
     @page {
@@ -22,7 +24,7 @@
 <body>
     <!-- Content for Static Frame 'header_frame' -->
     <div id="header_content">
-    	<h3>Fong Lim Enterprise</h3>
+    	<h3>Fong Lim Enterprise Sdn Bhd</h3>
     </div>
 
     <!-- Content for Static Frame 'footer_frame' -->
@@ -31,36 +33,29 @@
     </div>
 
     <br>
-      <table class="table table-borderless">
+    <table class="table table-borderless">
     <tr>
-        <td>image here</td>
-      <td>Fong Lim Enterprise</td>
-      <td>Invoice</td>
+        <td>put image hereX</td>
+        <td>Fong Lim Enterprise</td>
+        <td><h1>Invoice</h1></td>
     </tr>
     <tr>
-        <td>&nbsp;</td>
-      <td>Address: </td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-      <td>Email: </td>
-      <td>Invoice No: {{invoice.id}}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-      <td>Phone: </td>
-      <td>&nbsp;</td>
-    </tr>
-  <tr>
         <td>Customer Name: {{ invoice.customer }}</td>
+        <td>Address:</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Phone:</td>
+        <td>Email: </td>
+        <td>Invoice No: {{invoice.id}}</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
       <td>&nbsp;</td>
       <td>Date: {{ invoice.timeGenerated.date}}</td>
     </tr>
-  <tr>
-      <td>Delivery Address: {{ invoice.customer.companyAddress}}</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
+    <tr>
+      <td colspan="3">Delivery Address: {{ invoice.customer.companyAddress}}</td>
     </tr>
       </table>
 
@@ -69,31 +64,31 @@
 
     <table class="table table-bordered">
     <tr>
-        <th>Quantity</th>
-        <th>Code</th>
-        <th>Description</th>
-        <th>Unit Price</th>
-        <th>Subtotal</th>
+        <th align="left">Quantity</th>
+        <th align="left">Code</th>
+        <th align="left">Description</th>
+        <th align="left">Unit Price</th>
+        <th align="right">Subtotal</th>
     </tr>
         <!--loop through all orders in invoice-->
 {% for order in orders %}
                 <tr>
-                    <td>{{ order.weight }}</td>
-                    <td>{{ order.product.grade }}</td>
-                    <td>{{ order.product }}</td>
-                    <td>{{ order.product.unitPrice }}</td>
-                    <td>RM{{ order.subtotal}}</td>
+                    <td align="left">{{ order.weight }}</td>
+                    <td align="left">{{ order.product.grade }}</td>
+                    <td align="left">{{ order.product }}</td>
+                    <td align="left">{{ order.product.unitPrice }}</td>
+                    <td align="right">RM {{ order.subtotal}}</td>
                     </tr>
             {% endfor %}
         <!-- end loop -->
 
-
+    <tr></tr>
     <tr>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
-        <th class="">Grand Total: </th>
-        <th>RM{{ invoice.grandTotal }}</th>
+        <th align="left">Grand Total: </th>
+        <th align="right">RM {{ invoice.grandTotal }}</th>
     </tr>
     </table>
 <hr>
@@ -103,7 +98,6 @@
 
     <table>
     <tr>
-        <td>Issued by {{ user }}</td>
         <td>Company Chop</td>
     </tr>
 
@@ -113,3 +107,4 @@
     </tr>
 
     </table>
+

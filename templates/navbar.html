@@ -12,7 +12,7 @@
         <ul class="header__menu">
 
 
-          <li class="header__menuItem"><a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" width="50" > </a></li>
+          <li class="header__menuItem"><a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" > </a></li>
 
 
             <li class="header__menuItem"><a href="{% url 'home' %}">HOME</a></li>
@@ -22,6 +22,7 @@
           <li class="header__menuItem"><a href="{% url 'invoices' %}">INVOICES</a></li>
           <li class="header__menuItem"><a href="{% url 'customers' %}">CUSTOMERS</a></li>
           <li class="header__menuItem"><a href="{% url 'products' %}">PRODUCTS</a></li>
+          <li class="header__menuItem"><a href="{% url 'admin:index' %}"><img src="{% static 'images/settings-icon.svg' %}" > </a></li>
 
 
             <li class="header__menuItem"><a href="{% url 'logout' %}" class="btn btn--sub">Logout</a></li>

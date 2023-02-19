@@ -1,5 +1,5 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
 
 
@@ -15,10 +15,9 @@
         <div class="hero-section__search">
           <form id='searchForm' class="form" action="{% url 'orders' %}" method="get">
             <div class="form__field">
-              <label for="formInput#search">Search By Customer name </label>
+              <label for="formInput#search">Search By Customer </label>
               <input class="input input--text" id="formInput#search" type="text" name="search_query"
-                value="{{ search_query }}"
-                     placeholder="Search by Customer name" />
+                value="{{ search_query }}" placeholder="Search by Customer name" />
             </div>
 
               <input class="btn btn--sub btn--lg" type="submit" value="Search" /><h1 class="btn btn--sub btn--lg" type="button" value="ADD ORDER"><a href="{% url 'create-order' %}">+ New</a></h1>
@@ -27,32 +26,29 @@
         </div>
       </div>
     </section>
-
-    <br>
-
-    <br>
-
+<br>
       <table class="table">
   <thead>
-    <tr>
+    <tr class="align-left">
       <th>Transaction Time</th>
       <th>Customer Name</th>
       <th>Product</th>
-      <th>Weight</th>
-        <th>Subtotal</th>
+      <th class="align-numeric">Weight</th>
+      <th class="align-numeric">Subtotal</th>
+        <th class="align-center" colspan="3">Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for order in orders %}
-                <tr>
+                <tr class="align-left">
                     <td>{{ order.transactionTime }}</td>
                     <td>{{ order.customer }}</td>
                     <td>{{ order.product }}</td>
-                    <td>{{ order.weight }}</td>
-                    <td>{{ order.subtotal}}</td>
-                    <td><a href="{% url 'retrieve-order' order.id %}">View</a></td>
-                    <td><a href="{% url 'update-order' order.id %}">Edit</a></td>
-                    <td><a href="{% url 'delete-order' order.id %}">Delete</a></td>
+                    <td class="align-numeric">{{ order.weight }}</td>
+                    <td class="align-numeric">{{ order.subtotal}}</td>
+                    <td class="align-center"><a href="{% url 'retrieve-order' order.id %}"><img src="{% static 'images/view-icon.svg' %}" ></a></td>
+                    <td class="align-center"><a href="{% url 'update-order' order.id %}"><img src="{% static 'images/edit-icon.svg' %}" ></a></td>
+                    <td class="align-center"><a href="{% url 'delete-order' order.id %}"><img src="{% static 'images/delete-icon.svg' %}" ></a></td>
                 </tr>
             {% endfor %}
   </tbody>

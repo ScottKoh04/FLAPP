@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+# register models here
 class User(models.Model):
     firstname = models.CharField(max_length=50, null=True)
     lastname = models.CharField(max_length=50, null=True)
@@ -21,13 +21,13 @@ class Tier(models.Model):
     tier = models.CharField(max_length=10, choices=TIERS, null=True)
 
     def __str__(self):
-        return 'Tier ' + self.tier
+        return 'Tier ' + str(self.tier)
 
 class Customer(models.Model):
     firstname = models.CharField(max_length=50, null=True)
     lastname = models.CharField(max_length=50, null=True)
     companyName = models.CharField(max_length=100, null=True, default='N/A')
-    companyPhone = models.IntegerField(null=True, default='N/A')
+    companyPhone = models.IntegerField(null=True)
     companyAddress = models.CharField(max_length=200, null=True, default='N/A')
     phone = models.IntegerField(null=True)
     email = models.CharField(max_length=50, null=True)
@@ -67,7 +67,7 @@ class Order(models.Model):
     transactionTime = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     weight = models.IntegerField(null=True)
-    flag = models.BooleanField(null=True)
+    flag = models.BooleanField(default=False)
 
     @property
     def subtotal(self):

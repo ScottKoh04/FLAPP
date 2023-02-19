@@ -1,5 +1,5 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
 <main class="projects">
   <section class="hero-section text-center">
@@ -27,26 +27,26 @@
 
 <table class="table table-striped table-hover table-bordered">
   <thead>
-    <tr>
+    <tr class="align-left">
       <th>Invoice No.</th>
       <th>Date</th>
       <th>Customer</th>
       <th>Company Name</th>
       <!--<th>Summary</th>-->
-      <th>Grand Total</th>
-
+      <th class="align-numeric">Grand Total</th>
+      <th class="align-center">Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for invoice in invoices %}
-                <tr>
+                <tr class="align-left">
                     <td>{{ invoice.id }}</td>
                     <td>{{ invoice.timeGenerated }}</td>
                     <td>{{ invoice.customer }}</td>
                     <td>{{ invoice.customer.companyName }}</td>
                     <!--<td>{{ invoice.summary }}</td>-->
-                    <td>{{ invoice.grandTotal }}</td>
-                    <td><a href="{% url 'pdf_view' invoice.pk %}">View PDF</a></td>
+                    <td class="align-numeric">{{ invoice.grandTotal }}</td>
+                    <td class="align-center"><a href="{% url 'pdf_view' invoice.pk %}"><img src="{% static 'images/pdf-icon.svg' %}" ></a></td>
                 </tr>
             {% endfor %}
   </tbody>

@@ -8,7 +8,7 @@
             <div class="formWrapper">
 
                 <br>
-                <h1>View Order</h1>
+                <h1>Delete Customer</h1>
                 <form class="form" method="POST">
                     {% csrf_token %}
 
@@ -20,7 +20,9 @@
                     </div>
                     {% endfor %}
 
-                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Return" onclick="history.back()"/>
+                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Delete"/>
+                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Cancel" onclick="history.back()"/>
+
                 </form>
             </div>
         </div>

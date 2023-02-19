@@ -1,20 +1,17 @@
 from .models import Order, Invoice, Customer, Product
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.views import View
 
-#converting html to pdf
-from io import BytesIO
-from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
+# utility functions
 
+# search function - search database and return results which matches search_query given
 def searchItems(request, search_type):
     search_query = ''
 
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
-        print(search_query)
+
+    # separate searches for separate pages and models
     if search_type == 'search_order':
         orders = Order.objects.distinct().filter(
             Q(customer__firstname__icontains=search_query) |
@@ -43,7 +40,7 @@ def searchItems(request, search_type):
         )
         return invoices, search_query
 
-
+# paginate orders using Django paginator function
 def paginateItems(request, items):
     page = request.GET.get('page')
     results = 10
@@ -72,3 +69,31 @@ def paginateItems(request, items):
 
     return custom_range, items
 
+# search function for searching for orders using multiple filters
+def searchOrdersForInvoice(request):
+    customer = ''
+    startDate  = ''
+    endDate = ''
+
+    if request.GET.get('search_customer'):
+        customer = request.GET.get('search_customer')
+
+    if request.GET.get('search_startDate'):
+        startDate = request.GET.get('search_startDate')
+
+    if request.GET.get('search_endDate'):
+        endDate = request.GET.get('search_endDate')
+
+    #orders = Order.objects.filter(flag=False)
+
+    if customer == '':
+        orders = Order.objects.filter(flag=False)
+    else:
+        queryStr = 'SELECT * FROM products_order, products_customer WHERE products_order.customer_id = products_customer.id AND products_order.flag=false'
+        if customer != '':
+            queryStr += ' AND products_customer.firstname=' + '"' + customer + '"'
+        if startDate != '' and endDate != '' :
+            queryStr += ' AND transactionTime BETWEEN "' + startDate + '" AND "' + endDate + '"'
+
+        orders = Order.objects.raw(queryStr)
+    return orders, customer, startDate, endDate

@@ -1,18 +1,20 @@
+
 {% extends 'main.html' %}
 
 {% block content %}
+{% load static %}
 
-<table>
+<br><br><br>
+<table class="tableLanding">
     <tr>
-        <td><a href="{% url 'orders' %}">CREATE ORDER</a></td>
-        <td><a href="{% url 'invoices' %}">INVOICES</a></td>
-    </tr>
-
-    <tr>
-         <td><a href="{% url 'customers' %}">CUSTOMERS</a></td>
-         <td><a href="{% url 'products' %}">PRODUCTS</a></td>
-         <td><a href="{% url 'admin:index' %}">ADMIN</a></td>
+        <td>
+            <h2>Welcome to</h2><h1>FONG LIM ENTERPRISE</h1>
+            <br><br><br>
+            <h1 class="btn btn--sub btn--lg" type="button" value=""><a href="{% url 'create-order' %}">Create Order</a></h1>
+            <h1 class="btn btn--sub btn--lg" type="button" value=""><a href="{% url 'invoices' %}">View Invoices</a></h1>
+        </td>
+        <td rowspan="2"><img src="{% static 'images/landingPage.png' %}" ></td>
     </tr>
 </table>
-
+<br>
 {% endblock %}

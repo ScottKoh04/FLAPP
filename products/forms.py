@@ -1,8 +1,8 @@
 from django.forms import ModelForm
-from .models import Order, Customer, Product
 from django import forms
+from .models import Order, Customer, Product
 
-#making new order manually
+#forms for making new entries to models
 class OrderForm(ModelForm):
     class Meta:
         model = Order
@@ -10,6 +10,7 @@ class OrderForm(ModelForm):
         widgets = {
             'product': forms.RadioSelect()
         }
+
 class CustomerForm(ModelForm):
     class Meta:
         model = Customer
@@ -17,7 +18,6 @@ class CustomerForm(ModelForm):
         widgets = {
             'tier': forms.RadioSelect()
         }
-
 class ProductForm(ModelForm):
     class Meta:
         model = Product
