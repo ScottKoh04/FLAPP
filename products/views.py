@@ -173,7 +173,8 @@ def generateInvoices(request):
 
         messages.success(request, ("Invoice generated successfully"))
         context = {'invoice':invoice, 'orders':orders}
-        return render(request, 'singleInvoice.html', context)
+        return redirect('invoices')
+        #return render(request, 'singleInvoice.html', context)
 
     # search for orders to generate invoice
     else:

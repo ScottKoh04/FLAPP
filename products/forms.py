@@ -2,6 +2,8 @@ from django.forms import ModelForm
 from django import forms
 from .models import Order, Customer, Product
 
+from django.core import validators
+
 #forms for making new entries to models
 class OrderForm(ModelForm):
     class Meta:
@@ -14,7 +16,7 @@ class OrderForm(ModelForm):
 class CustomerForm(ModelForm):
     class Meta:
         model = Customer
-        fields = ['firstname', 'lastname', 'phone', 'email', 'companyName', 'companyPhone', 'companyAddress', 'tier',]
+        fields = ['firstname', 'lastname', 'phone', 'email', 'address', 'companyName', 'companyPhone', 'companyAddress', 'city', 'state', 'postcode', 'tier']
         widgets = {
             'tier': forms.RadioSelect()
         }
