@@ -1,0 +1,64 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<main class="projects">
+    <section class="hero-section text-center">
+    <div class="container container--narrow">
+      <div class="hero-section__box">
+        <h2>KPI <span>Reports</span></h2>
+      </div>
+    </div>
+</main>
+
+<table class="table">
+    <tr>
+        <td>Daily Revenue:</td>
+        <td>Monthly Revenue:</td>
+        <td>Yearly Revenue:</td>
+    </tr>
+    <tr>
+        <td><h2>{{ dailyRevenue }}</h2></td>
+        <td><h2>{{ monthlyRevenue }}</h2></td>
+        <td><h2>{{ yearlyRevenue }}</h2></td>
+    </tr>
+    <tr>
+        <td><img src="{% static 'charts/daily-sales.png' %}" ></td>
+        <td>
+            <table class="table">
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Revenue</th>
+                </tr>
+                {% for key, value in topCustomers.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+        <tr>
+        <td><img src="{% static 'charts/daily-sales.png' %}" ></td>
+        <td>
+            <table class="table">
+                <tr>
+                    <th>Product</th>
+                    <th>Revenue</th>
+                </tr>
+                {% for key, value in topProducts.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+{% endblock content %}

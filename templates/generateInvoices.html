@@ -40,6 +40,7 @@
       <th>Transaction Time</th>
       <th>Customer Name</th>
       <th>Product</th>
+      <th class="align-numeric">Unit Price</th>
       <th class="align-numeric">Weight</th>
       <th class="align-numeric">Subtotal</th>
     </tr>
@@ -58,6 +59,7 @@
                     <td>{{ order.transactionTime }}</td>
                     <td>{{ order.customer }}</td>
                     <td>{{ order.product }}</td>
+                    <td class="align-numeric">{{ order.product.unitPrice }}</td>
                     <td class="align-numeric">{{ order.weight }}</td>
                     <td class="align-numeric">{{ order.subtotal}}</td>
                 </tr>

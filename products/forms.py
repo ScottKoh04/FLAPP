@@ -28,3 +28,4 @@ class ProductForm(ModelForm):
             'grade': forms.RadioSelect(),
             'tier': forms.RadioSelect()
         }
+

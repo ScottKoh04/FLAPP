@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "products.apps.ProductsConfig",
     "django_filters",
     "phonenumber_field",
+    "matplotlib",
 ]
 
 MIDDLEWARE = [
@@ -107,11 +108,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kuala_Lumpur"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

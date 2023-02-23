@@ -4,6 +4,7 @@ from django.core import validators
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from phonenumber_field.modelfields import PhoneNumberField
+
 # register models here
 class User(models.Model):
     firstname = models.CharField(max_length=50, null=True)
@@ -48,7 +49,7 @@ class Customer(models.Model):
     address = models.CharField(max_length=200, null=True, default='N/A')
 
 
-    phone_regex = validators.RegexValidator(regex=r'^\d{3}\d{3}\d{4}$')
+    phone_regex = RegexValidator(regex=r'^\d{3}\d{3}\d{4}$')
     phone = models.CharField(null=True, max_length=30, validators=[phone_regex])
     email = models.EmailField(null=True, validators=[validators.EmailValidator()])
     #email = models.CharField(max_length=50, null=True)
@@ -60,9 +61,13 @@ class Customer(models.Model):
     state = models.CharField(max_length=15, choices=STATES, null=True)
     postcode = models.IntegerField(null=True)
     tier = models.ForeignKey(Tier, on_delete=models.PROTECT)
-
+    @property
+    def fullname(self):
+        return f"{self.firstname} {self.lastname}"
     def __str__(self):
-        return self.firstname + ' ' + self.lastname
+        return f"{self.firstname} {self.lastname}"
+
+
 
 class Product(models.Model):
     GRADES = (
@@ -78,7 +83,11 @@ class Product(models.Model):
     unitPrice = models.FloatField(null=True)
 
     def __str__(self):
-        return self.productName + '-' + self.grade + '-' + str(self.tier)
+        return f"{self.productName} {self.grade} {self.tier}"
+
+    @property
+    def nameAndGrade(self):
+        return f"{self.productName} {self.grade}"
 
 class Invoice(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True)
@@ -91,7 +100,7 @@ class Invoice(models.Model):
 
 class Order(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.SET_NULL, null=True)
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True)
     transactionTime = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     weight = models.IntegerField(null=True)
@@ -106,5 +115,6 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['-transactionTime']
+
 
 

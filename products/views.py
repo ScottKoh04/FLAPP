@@ -8,12 +8,20 @@ from django.contrib import messages
 from .utilities import searchItems, paginateItems, searchOrdersForInvoice
 from django.template import RequestContext
 
+from datetime import date, datetime, timedelta
+
 # for converting html page to pdf
 from io import BytesIO
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.views.generic import ListView
 from django.http import HttpResponse
+
+import random
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+import numpy as np
 
 # Create your views here.
 def loginUser(request):
@@ -65,6 +73,14 @@ def createOrder(request):
             return redirect('orders')
     context = {'form': form}
     return render(request, "order_form.html", context)
+
+@login_required(login_url='login')
+def createQROrder(request):
+    productName = request.GET.get('productName')
+    grade = request.GET.get('grade')
+    weight = request.GET.get('weight')
+
+    return render(request, "order_form.html")
 @login_required(login_url='login')
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
@@ -254,3 +270,108 @@ def deleteCustomer(request, pk):
         return redirect('customers')
     context = {'form':form}
     return render(request, 'delete_customer.html', context)
+
+
+@login_required(login_url='login')
+def reports(request):
+    today = datetime.now().date()
+    year = str(today.year)
+    month = str(today.month)
+    # +1 to include today
+    day = str(today.day + 1)
+    todayDateString = year + '-' + month + '-' + day
+    startDayOfYear = year + '-01-01'
+
+    dailyRevenue = 0
+    monthlyRevenue = 0
+    yearlyRevenue = 0
+
+    orders = Order.objects.filter(transactionTime__range=[startDayOfYear, todayDateString])
+
+    for order in orders:
+        if order.transactionTime.day == today.day and order.transactionTime.month == today.month and order.transactionTime.year == today.year:
+            dailyRevenue += order.subtotal
+        if order.transactionTime.month == today.month and order.transactionTime.year == today.year:
+            monthlyRevenue += order.subtotal
+        if order.transactionTime.year == today.year:
+            yearlyRevenue += order.subtotal
+
+    monthToDate = today - timedelta(30)
+    def daterange(start_date, end_date):
+        for n in range(int((end_date - start_date).days)):
+            yield start_date + timedelta(n)
+    def dailySalesChart():
+        days = []
+        sales = []
+        for singleDay in daterange(monthToDate, today):
+            days.append(singleDay.strftime("%m-%d"))
+            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
+
+            daySales = 0
+            for order in orders:
+                daySales += order.weight
+            sales.append(daySales)
+
+        # create a figure and a subplot
+        fig, ax = plt.subplots()
+
+        # plot the data as a line
+        ax.bar(days, sales)
+
+        # set the title and axis labels
+        ax.set_title('30 Days - Daily Sales')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Sales')
+
+        ax.set_xticks(days[::5])
+        ax.set_xticklabels(days[::5])
+
+        ax.tick_params(axis='x', labelsize=6)
+
+        ax.tick_params(axis='y', which='major', labelsize=6)
+
+        plt.savefig('static/charts/daily-sales.png')
+
+    dailySalesChart()
+
+    def listOfTopCustomers():
+        customers = {}
+        orders = Order.objects.filter(transactionTime__range=[monthToDate, todayDateString])
+        for order in orders:
+            if order.customer.fullname not in customers:
+                customers.update({order.customer.fullname: order.subtotal})
+            elif order.customer.fullname in customers:
+                customers[order.customer.fullname] += order.subtotal
+
+        sorted_customers = dict(sorted(customers.items(), key=lambda item: item[1], reverse=True))
+
+        topCustomers = {}
+        # return top 10 customers
+        for key in list(sorted_customers.keys())[:10]:
+            topCustomers[key] = sorted_customers[key]
+        return topCustomers
+
+    def listOfTopProducts():
+        products = {}
+        orders = Order.objects.filter(transactionTime__range=[monthToDate, todayDateString])
+        for order in orders:
+            if order.product.nameAndGrade not in products:
+                products.update({order.product.nameAndGrade: order.subtotal})
+            elif order.product.nameAndGrade in products:
+                products[order.product.nameAndGrade] += order.subtotal
+
+        sorted_products = dict(sorted(products.items(), key=lambda item: item[1], reverse=True))
+
+        topProducts = {}
+        # return top 10 customers
+        for key in list(sorted_products.keys())[:10]:
+            topProducts[key] = sorted_products[key]
+        return topProducts
+
+    topCustomers = listOfTopCustomers()
+    topProducts = listOfTopProducts()
+    context = {'dailyRevenue': dailyRevenue, 'monthlyRevenue': monthlyRevenue, 'yearlyRevenue': yearlyRevenue, 'topCustomers': topCustomers, 'topProducts':topProducts}
+    return render(request, 'reports.html', context)
+
+
+
