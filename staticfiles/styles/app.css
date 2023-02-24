@@ -855,7 +855,7 @@ img {
 .alert {
   position: fixed;
   left: 50%;
-  top: 120px;
+  top: 210px;
   transform: translate(-50%, -50%);
 
 
@@ -864,4 +864,27 @@ img {
 
 .table {
   border: 1px solid;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tableLanding {
+  width: 50%;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-numeric {
+  text-align: right;
+}
+
+.align-center {
+  text-align: center;
 }
