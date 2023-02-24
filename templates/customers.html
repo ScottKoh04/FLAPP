@@ -44,6 +44,7 @@
                 <td class="align-numeric">{{ customer.companyPhone }}</td>
                 <!--<td>{{ customer.companyAddress }}</td>-->
                 <td>{{ customer.tier }}</td>
+                <td class="align-center"><a href="{% url 'retrieve-customer' customer.id %}"><img src="{% static 'images/view-icon.svg' %}" ></a></td>
                 <td class="align-center"><a href="{% url 'update-customer' customer.id %}"><img src="{% static 'images/edit-icon.svg' %}" ></a></td>
                 <td class="align-center"><a href="{% url 'delete-customer' customer.id %}"><img src="{% static 'images/delete-icon.svg' %}" ></a></td>
 

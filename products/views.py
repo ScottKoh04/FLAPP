@@ -45,7 +45,7 @@ def loginUser(request):
         else:
             messages.error(request, 'Username or password is incorrect')
 
-    return render(request, "login_register.html")
+    return render(request, "login.html")
 @login_required(login_url='login')
 def logoutUser(request):
     logout(request)
@@ -103,7 +103,7 @@ def retrieveOrder(request, pk):
         form = OrderForm(request.POST, instance=order)
 
     context = {'form': form}
-    return render(request, "view-order.html", context)
+    return render(request, "view_order.html", context)
 @login_required(login_url='login')
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
@@ -248,6 +248,17 @@ def createCustomer(request):
             return redirect('customers')
     context = {'form': form}
     return render(request, "customer_form.html", context)
+
+@login_required(login_url='login')
+def retrieveCustomer(request, pk):
+    customer = Customer.objects.get(id=pk)
+    form = CustomerForm(instance=customer)
+
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+
+    context = {'form': form}
+    return render(request, "view_customer.html", context)
 @login_required(login_url='login')
 def updateCustomer(request, pk):
     customer = Customer.objects.get(id=pk)

@@ -16,9 +16,7 @@ urlpatterns = [
 
     path("orders/", views.orders, name="orders"),
     path('create-order/', views.createOrder, name="create-order"),
-    #path("create-QR-order/<str:firstname>/<str:grade>/", views.createQROrder, name="create-QR-order"),
     path('create-QR-order/', views.createQROrder, name="create-QR-order"),
-
 
     path("retrieve-order/<str:pk>/", views.retrieveOrder, name="retrieve-order"),
     path('update-order/<str:pk>/', views.updateOrder, name="update-order"),
@@ -26,6 +24,7 @@ urlpatterns = [
 
     path("customers/", views.customers, name="customers"),
     path('create-customer/', views.createCustomer, name="create-customer"),
+    path("retrieve-customer/<str:pk>/", views.retrieveCustomer, name="retrieve-customer"),
     path('update-customer/<str:pk>/', views.updateCustomer, name="update-customer"),
     path('delete-customer/<str:pk>/', views.deleteCustomer, name="delete-customer"),
 
