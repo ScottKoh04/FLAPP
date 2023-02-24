@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-01#$csf(tp5pns!5$5zqb*$8p^4e)-zq8t+%p3w%gefr$o$vk9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'flapp.herokuapp.com']
 
 
 # Application definition
@@ -83,12 +83,22 @@ WSGI_APPLICATION = "FLAPP.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'flappdb',
+        'USER': 'postgres',
+        'PASSWORD': 'djangokewl',
+        'HOST': 'database-1.cxrgxao6gzsu.us-east-1.rds.amazonaws.com',
+        'PORT': '5432'
     }
 }
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -136,3 +146,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# changes debug to False when running in production
+if os.getcwd() == '/app':
+    DEBUG = False
