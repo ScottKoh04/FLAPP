@@ -9,13 +9,13 @@
     <tr>
         <td>
             <h3>Welcome to</h3><h2>TAIPING FONG LIM ENTERPRISE</h2>
-            <br><br>
+            <br><br><br>
             {% if request.user.is_authenticated %}
-            <h2 class="btn btn--sub btn--lg" type="button" value=""><a href="{% url 'create-order' %}">Create Order</a></h2>
-            <br><br>
-            <h2 class="btn btn--sub btn--lg" type="button" value=""><a href="{% url 'invoices' %}">View Invoices</a></h2>
+            <h1 class="btn btn--sub btn--lg" type="button" value=""><a href="{% url 'create-order' %}">Create Order</a></h1>
+            <h1 class="btn btn--sub btn--lg" type="button" value=""><a href="{% url 'invoices' %}">View Invoices</a></h1>
             {% endif %}
         </td>
+        <td rowspan="2"><img src="{% static 'images/landingPage.png' %}" ></td>
     </tr>
 </table>
 <br>

@@ -29,7 +29,6 @@
         <tr class="align-center">
             <th>Product</th>
             <th>Grade</th>
-            <th>Tier</th>
             <th>Unit Price</th>
             <th>Actions</th>
         </tr>
@@ -37,7 +36,6 @@
             <tr class="align-center">
                 <td>{{ product.productName }}</td>
                 <td>{{ product.grade }}</td>
-                <td>{{ product.tier }}</td>
                 <td>{{ product.unitPrice }}</td>
                 <td><a href="{% url 'update-product' product.id %}"><img src="{% static 'images/edit-icon.svg' %}" ></a></td>
             </tr>

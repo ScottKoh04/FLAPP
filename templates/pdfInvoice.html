@@ -96,11 +96,11 @@
         <!--loop through all orders in invoice-->
 {% for order in orders %}
                 <tr>
-                    <td align="left">{{ order.weight }}</td>
+                    <td align="left">{{ order.weight }}kg</td>
                     <td align="left">{{ order.product.grade }}</td>
                     <td align="left">{{ order.product }}</td>
                     <td align="left">{{ order.product.unitPrice }}</td>
-                    <td align="right">RM {{ order.subtotal}}</td>
+                    <td align="right">RM {{ order.subtotal }}</td>
                     </tr>
             {% endfor %}
 
@@ -111,8 +111,22 @@
         <th>&nbsp;</th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
-        <th align="left">Grand Total: </th>
+        <th align="left">Total: </th>
         <th align="right">RM {{ invoice.grandTotal }}</th>
+    </tr>
+    <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th align="left">Discount: </th>
+        <th align="right">{{ percentDiscount }}</th>
+    </tr>
+    <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th align="left">Grand Total: </th>
+        <th align="right">RM {{ invoice.discountedTotal }}</th>
     </tr>
 </table>
 <hr>

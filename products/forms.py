@@ -23,9 +23,8 @@ class CustomerForm(ModelForm):
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['productName', 'grade', 'tier', 'unitPrice',]
+        fields = ['productName', 'grade', 'unitPrice',]
         widgets = {
-            'grade': forms.RadioSelect(),
-            'tier': forms.RadioSelect()
+            'grade': forms.RadioSelect()
         }
 

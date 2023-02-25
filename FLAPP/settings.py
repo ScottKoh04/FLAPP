@@ -27,6 +27,7 @@ SECRET_KEY = "django-insecure-01#$csf(tp5pns!5$5zqb*$8p^4e)-zq8t+%p3w%gefr$o$vk9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+# super important - do not forget to add new site url created in heroku else you will get a BAD GATEWAY (500) error
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'flapp-app.herokuapp.com', 'flapp.herokuapp.com']
 
 

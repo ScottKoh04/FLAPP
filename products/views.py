@@ -61,6 +61,7 @@ def orders(request):
     custom_range, orders = paginateItems(request, orders)
     context = {'orders': orders, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'orders.html', context)
+
 @login_required(login_url='login')
 def createOrder(request):
     form = OrderForm()
@@ -68,18 +69,28 @@ def createOrder(request):
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
-
-            form.save()
+            order = form.save()
+            if order.customer.tier == '1':
+                Order.objects.filter(pk=order.pk).update(discount=0.8)
+            elif order.customer.tier == '2':
+                Order.objects.filter(pk=order.pk).update(discount=0.9)
             return redirect('orders')
     context = {'form': form}
     return render(request, "order_form.html", context)
 
 @login_required(login_url='login')
 def createQROrder(request):
+    #example url qr code
+
     productName = request.GET.get('productName')
     grade = request.GET.get('grade')
     weight = request.GET.get('weight')
 
+    product = Product.objects.get(productName=productName, grade=grade)
+
+    form = OrderForm()
+    form.product = product
+    form.weight = weight
     return render(request, "order_form.html")
 @login_required(login_url='login')
 def updateOrder(request, pk):
@@ -89,7 +100,11 @@ def updateOrder(request, pk):
     if request.method == 'POST':
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
-            form.save()
+            order = form.save()
+            if order.customer.tier == '1':
+                Order.objects.filter(pk=order.pk).update(discount=0.8)
+            elif order.customer.tier == '2':
+                Order.objects.filter(pk=order.pk).update(discount=0.9)
             return redirect('orders')
 
     context = {'form': form}
@@ -131,7 +146,8 @@ def render_pdf_view(request, *args, **kwargs):
     invoice = Invoice.objects.get(pk=pk)
     orders = Order.objects.filter(invoice=pk)
 
-    context = {'orders': orders, 'invoice': invoice}
+    percentDiscount = str(round((1-orders[0].discount)*100))+'%'
+    context = {'orders': orders, 'invoice': invoice, 'percentDiscount':percentDiscount}
     template_path = 'pdfInvoice.html'
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
@@ -162,7 +178,8 @@ def generateInvoices(request):
         id_list = request.POST.getlist('boxes')
         orders = [Order.objects.get(id=id) for id in id_list]
 
-        customer = orders[0].customer
+        mainOrder = orders[0]
+        customer = mainOrder.customer
 
         # create new invoice and assign customer with customer of first order (assume user will create invoices with orders from same customer)
         invoice = Invoice()
@@ -174,12 +191,8 @@ def generateInvoices(request):
             grandTotal += order.subtotal
         invoice.grandTotal = grandTotal
 
-        # form invoice summary
-        summary = str(orders[0].product.productName)
-        for order in orders:
-            summary = summary + ' ' + str(order.product.grade) + ' ' + str(order.weight) + 'kg ,'
-        invoice.summary = summary
-
+        discountedTotal = grandTotal * mainOrder.discount
+        invoice.discountedTotal = discountedTotal
         invoice.save()
 
         # update flag to false once order has been assigned to an invoice
@@ -188,9 +201,7 @@ def generateInvoices(request):
             Order.objects.filter(pk=int(order)).update(invoice=invoice)
 
         messages.success(request, ("Invoice generated successfully"))
-        context = {'invoice':invoice, 'orders':orders}
         return redirect('invoices')
-        #return render(request, 'singleInvoice.html', context)
 
     # search for orders to generate invoice
     else:

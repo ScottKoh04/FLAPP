@@ -30,10 +30,13 @@
     <tr class="align-left">
       <th>Transaction Time</th>
       <th>Customer Name</th>
+      <th>Tier</th>
       <th>Product</th>
       <th class="align-numeric">Unit Price</th>
       <th class="align-numeric">Weight</th>
       <th class="align-numeric">Subtotal</th>
+      <th class="align-numeric">Discount</th>
+      <th class="align-numeric">Discounted Total</th>
         <th class="align-center" colspan="3">Actions</th>
     </tr>
   </thead>
@@ -42,10 +45,13 @@
                 <tr class="align-left">
                     <td>{{ order.transactionTime }}</td>
                     <td>{{ order.customer }}</td>
+                    <td>{{ order.customer.tier }}</td>
                     <td>{{ order.product }}</td>
                     <td class="align-numeric">{{ order.product.unitPrice }}</td>
                     <td class="align-numeric">{{ order.weight }}</td>
                     <td class="align-numeric">{{ order.subtotal}}</td>
+                    <td class="align-numeric">{{ order.discount}}</td>
+                    <td class="align-numeric">{{ order.discountedTotal}}</td>
                     <td class="align-center"><a href="{% url 'retrieve-order' order.id %}"><img src="{% static 'images/view-icon.svg' %}" ></a></td>
                     <td class="align-center"><a href="{% url 'update-order' order.id %}"><img src="{% static 'images/edit-icon.svg' %}" ></a></td>
                     <td class="align-center"><a href="{% url 'delete-order' order.id %}"><img src="{% static 'images/delete-icon.svg' %}" ></a></td>
