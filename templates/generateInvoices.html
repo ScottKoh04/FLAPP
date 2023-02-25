@@ -12,12 +12,8 @@
         <div class="hero-section__search">
           <form method="get">
 
-              <input size="25" type="text" name="search_customer" value="{{ customer }}" placeholder="Customer or Company"/>
-              <!--
-              Date <input size="15" type="text" name="search_startDate" value="{{ startDate }}" placeholder="YYYY-MM-DD"/>
-              to<input size="15" type="text" name="search_endDate" value="{{ endDate }}" placeholder="YYYY-MM-DD"/>
-                -->
-              Date <select name="selected_days" >
+              <input style="height: 40px;" size="25" type="text" name="search_customer" value="{{ customer }}" placeholder="Customer or Company"/>
+              &nbsp;Date <select style="height: 40px;" name="selected_days" >
                       <option value="1" {% if selected_days == '1' %} selected {% endif %}>Today</option>
                       <option value="7" {% if selected_days == '7' %} selected {% endif %}>Last 7 Days</option>
                       <option value="30" {% if selected_days == '30' %} selected {% endif %}>Last 30 Days</option>
