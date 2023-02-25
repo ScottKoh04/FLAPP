@@ -30,7 +30,9 @@
     </section>
 
 
-  <br/><br/>
+  <br>
+      <div class="align-center"><button class="btn btn-secondary" type="submit">Generate Invoice</button></div>
+  <br>
   <form action="" method="POST">
       {% csrf_token %}
 
@@ -71,9 +73,6 @@
             {% endfor %}
   </tbody>
 </table>
-
-  <br/>
-      <div class="align-center"><button class="btn btn-secondary" type="submit">Generate Invoice</button></div>
 
     {% include 'pagination.html' with queryset=orders custom_range=custom_range %}
   </form>
