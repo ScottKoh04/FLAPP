@@ -4,7 +4,7 @@ from django.db.models import Q
 from .forms import OrderForm, CustomerForm, ProductForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .utilities import searchItems, paginateItems, searchOrdersForInvoice
 from django.template import RequestContext
@@ -108,6 +108,7 @@ def createQROrder(request):
     context = {'form':form}
     return render(request, "order_form.html", context)
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
@@ -135,6 +136,7 @@ def retrieveOrder(request, pk):
     context = {'form': form}
     return render(request, "view_order.html", context)
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
@@ -187,6 +189,7 @@ def render_pdf_view(request, *args, **kwargs):
     return response
 
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def generateInvoices(request):
     # generate actual invoice
     if request.method == "POST":
@@ -231,6 +234,7 @@ def products(request):
     context = {'products': products, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'products.html', context)
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def createProduct(request):
     form = ProductForm()
 
@@ -243,6 +247,7 @@ def createProduct(request):
     context = {'form': form}
     return render(request, "product_form.html", context)
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def updateProduct(request, pk):
     product = Product.objects.get(id=pk)
     form = ProductForm(instance=product)
@@ -257,12 +262,14 @@ def updateProduct(request, pk):
     return render(request, "product_form.html", context)
 
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def customers(request):
     customers, search_query = searchItems(request, 'search_customer')
     custom_range, customers = paginateItems(request, customers)
     context = {'customers': customers, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'customers.html', context)
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def createCustomer(request):
     form = CustomerForm()
 
@@ -276,6 +283,7 @@ def createCustomer(request):
     return render(request, "customer_form.html", context)
 
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def retrieveCustomer(request, pk):
     customer = Customer.objects.get(id=pk)
     form = CustomerForm(instance=customer)
@@ -286,6 +294,7 @@ def retrieveCustomer(request, pk):
     context = {'form': form}
     return render(request, "view_customer.html", context)
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def updateCustomer(request, pk):
     customer = Customer.objects.get(id=pk)
     form = CustomerForm(instance=customer)
@@ -298,7 +307,9 @@ def updateCustomer(request, pk):
 
     context = {'form': form}
     return render(request, "customer_form.html", context)
+
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def deleteCustomer(request, pk):
     customer = Customer.objects.get(id=pk)
     form = CustomerForm(instance=customer)
@@ -308,23 +319,18 @@ def deleteCustomer(request, pk):
     context = {'form':form}
     return render(request, 'delete_customer.html', context)
 
-
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def reports(request):
     today = datetime.now().date()
-    year = str(today.year)
-    month = str(today.month)
-    # +1 to include today
-    day = str(today.day + 1)
-    todayDateString = year + '-' + month + '-' + day
-    startDayOfYear = year + '-01-01'
+    tomorrow = datetime.now().date() + timedelta(days=1)
+    startOfYear = today.replace(month=1, day=1)
 
     dailyRevenue = 0
     monthlyRevenue = 0
     yearlyRevenue = 0
 
-    orders = Order.objects.filter(transactionTime__range=[startDayOfYear, todayDateString])
-
+    orders = Order.objects.filter(transactionTime__range=[startOfYear, tomorrow])
     for order in orders:
         if order.transactionTime.day == today.day and order.transactionTime.month == today.month and order.transactionTime.year == today.year:
             dailyRevenue += order.subtotal
@@ -333,14 +339,48 @@ def reports(request):
         if order.transactionTime.year == today.year:
             yearlyRevenue += order.subtotal
 
-    monthToDate = today - timedelta(30)
+    monthToDate = tomorrow - timedelta(days=30)
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
+
+    def dailyRevenuesChart():
+        days = []
+        revenues = []
+        for singleDay in daterange(monthToDate, tomorrow):
+            days.append(singleDay.strftime("%m-%d"))
+            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
+
+            dayRevenue = 0
+            for order in orders:
+                dayRevenue += order.discountedTotal()
+            revenues.append(dayRevenue)
+
+        # create a figure and a subplot
+        fig, ax = plt.subplots()
+
+        # plot the data as a line
+        ax.bar(days, revenues)
+
+        # set the title and axis labels
+        ax.set_title('30 Days - Daily Revenues')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Revenue')
+
+        ax.set_xticks(days[::5])
+        ax.set_xticklabels(days[::5])
+
+        ax.tick_params(axis='x', labelsize=6)
+
+        ax.tick_params(axis='y', which='major', labelsize=6)
+
+        plt.savefig('static/charts/daily-revenues.png')
+
+    dailyRevenuesChart()
     def dailySalesChart():
         days = []
         sales = []
-        for singleDay in daterange(monthToDate, today):
+        for singleDay in daterange(monthToDate, tomorrow):
             days.append(singleDay.strftime("%m-%d"))
             orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
 
@@ -373,12 +413,12 @@ def reports(request):
 
     def listOfTopCustomers():
         customers = {}
-        orders = Order.objects.filter(transactionTime__range=[monthToDate, todayDateString])
+        orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
         for order in orders:
-            if order.customer.fullname not in customers:
-                customers.update({order.customer.fullname: order.subtotal})
-            elif order.customer.fullname in customers:
-                customers[order.customer.fullname] += order.subtotal
+            if order.customer not in customers:
+                customers.update({order.customer: order.subtotal})
+            elif order.customer in customers:
+                customers[order.customer] += order.subtotal
 
         sorted_customers = dict(sorted(customers.items(), key=lambda item: item[1], reverse=True))
 
@@ -388,14 +428,16 @@ def reports(request):
             topCustomers[key] = sorted_customers[key]
         return topCustomers
 
+    topCustomers = listOfTopCustomers()
+
     def listOfTopProducts():
         products = {}
-        orders = Order.objects.filter(transactionTime__range=[monthToDate, todayDateString])
+        orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
         for order in orders:
-            if order.product.nameAndGrade not in products:
-                products.update({order.product.nameAndGrade: order.subtotal})
-            elif order.product.nameAndGrade in products:
-                products[order.product.nameAndGrade] += order.subtotal
+            if order.product not in products:
+                products.update({order.product: order.subtotal})
+            elif order.product in products:
+                products[order.product] += order.subtotal
 
         sorted_products = dict(sorted(products.items(), key=lambda item: item[1], reverse=True))
 
@@ -405,8 +447,36 @@ def reports(request):
             topProducts[key] = sorted_products[key]
         return topProducts
 
-    topCustomers = listOfTopCustomers()
     topProducts = listOfTopProducts()
+
+    def topCustomersChart():
+        topCustomersList = list(topCustomers.keys())
+        totalRevenues = list(topCustomers.values())
+
+        fig1, ax1 = plt.subplots()
+        ax1.pie(totalRevenues, labels=topCustomersList, autopct='%1.1f%%', startangle=90)
+        ax1.axis('equal')
+
+        plt.title('Top Customers By Revenue')
+
+        plt.savefig('static/charts/top-customers.png')
+
+    topCustomersChart()
+
+    def topProductsChart():
+        topProductsList = list(topProducts.keys())
+        totalRevenues = list(topProducts.values())
+
+        fig1, ax1 = plt.subplots()
+        ax1.pie(totalRevenues, labels=topProductsList, autopct='%1.1f%%', startangle=90)
+        ax1.axis('equal')
+
+        plt.title('Top Products By Revenue')
+
+        plt.savefig('static/charts/top-products.png')
+
+    topProductsChart()
+
     context = {'dailyRevenue': dailyRevenue, 'monthlyRevenue': monthlyRevenue, 'yearlyRevenue': yearlyRevenue, 'topCustomers': topCustomers, 'topProducts':topProducts}
     return render(request, 'reports.html', context)
 

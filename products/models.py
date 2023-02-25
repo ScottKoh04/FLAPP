@@ -74,9 +74,6 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.productName} {self.grade}"
 
-    @property
-    def nameAndGrade(self):
-        return f"{self.productName} {self.grade}"
 
 class Invoice(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True)

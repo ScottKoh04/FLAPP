@@ -1,55 +1,50 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
-<main class="projects">
-    <section class="hero-section text-center">
-    <div class="container container--narrow">
-      <div class="hero-section__box">
-        <h2>KPI <span>Reports</span></h2>
-      </div>
-    </div>
-</main>
-
-<table class="table">
+<h1 class="align-center">KPI REPORTS</h1>
+<hr>
+<table class="tableReport">
     <tr>
         <td>Daily Revenue:</td>
         <td>Monthly Revenue:</td>
         <td>Yearly Revenue:</td>
     </tr>
     <tr>
-        <td><h2>{{ dailyRevenue }}</h2></td>
-        <td><h2>{{ monthlyRevenue }}</h2></td>
-        <td><h2>{{ yearlyRevenue }}</h2></td>
+        <td><h2>RM{{ dailyRevenue }}</h2></td>
+        <td><h2>RM{{ monthlyRevenue }}</h2></td>
+        <td><h2>RM{{ yearlyRevenue }}</h2></td>
     </tr>
     <tr>
-        <td><img src="{% static 'charts/daily-sales.png' %}" ></td>
+        <td><img src="{% static 'charts/daily-revenues.png' %}" ></td>
+        <td><img src="{% static 'charts/top-customers.png' %}"></td>
         <td>
-            <table class="table">
+            <table class="tableReport">
                 <tr>
-                    <th>Customer Name</th>
-                    <th>Revenue</th>
+                    <th>Customer</th>
+                    <th class="align-numeric">Revenue</th>
                 </tr>
                 {% for key, value in topCustomers.items %}
                 <tr>
-                    <td>{{ key }}</td>
-                    <td>{{ value }}</td>
+                    <td class="align-center">{{ key }}</td>
+                    <td class="align-numeric">RM{{ value }}</td>
                 </tr>
                 {% endfor %}
             </table>
         </td>
     </tr>
-        <tr>
-        <td></td>
+    <tr>
+        <td><img src="{% static 'charts/daily-sales.png' %}" ></td>
+        <td><img src="{% static 'charts/top-products.png' %}"></td>
         <td>
-            <table class="table">
+            <table class="tableReport">
                 <tr>
                     <th>Product</th>
-                    <th>Revenue</th>
+                    <th class="align-numeric">Revenue</th>
                 </tr>
                 {% for key, value in topProducts.items %}
                 <tr>
-                    <td>{{ key }}</td>
-                    <td>{{ value }}</td>
+                    <td class="align-center">{{ key }}</td>
+                    <td class="align-numeric">RM{{ value }}</td>
                 </tr>
                 {% endfor %}
             </table>
