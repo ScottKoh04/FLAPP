@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Order, User, Product, Customer, Invoice
+from django.db.models import Q
 from .forms import OrderForm, CustomerForm, ProductForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
@@ -80,18 +81,32 @@ def createOrder(request):
 
 @login_required(login_url='login')
 def createQROrder(request):
-    #example url qr code
-
+    # example url qr code
+    # https://flapp-app.herokuapp.com/create-QR-order/?productName=Guava&grade=AA&weight=40
     productName = request.GET.get('productName')
     grade = request.GET.get('grade')
+
     weight = request.GET.get('weight')
+    product = Product.objects.get(Q(productName=productName) & Q(grade=grade))
 
-    product = Product.objects.get(productName=productName, grade=grade)
+    order = Order()
+    order.product = product
+    order.weight = weight
+    order.save()
 
-    form = OrderForm()
-    form.product = product
-    form.weight = weight
-    return render(request, "order_form.html")
+    form = OrderForm(instance=order)
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST, instance=order)
+        if form.is_valid():
+            order = form.save()
+            if order.customer.tier == '1':
+                Order.objects.filter(pk=order.pk).update(discount=0.8)
+            elif order.customer.tier == '2':
+                Order.objects.filter(pk=order.pk).update(discount=0.9)
+            return redirect('orders')
+    context = {'form':form}
+    return render(request, "order_form.html", context)
 @login_required(login_url='login')
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
