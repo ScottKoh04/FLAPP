@@ -1,7 +1,7 @@
 from .models import Order, Invoice, Customer, Product
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-
+from datetime import datetime, timedelta
 # utility functions
 
 # search function - search database and return results which matches search_query given
@@ -70,30 +70,38 @@ def paginateItems(request, items):
     return custom_range, items
 
 # search function for searching for orders using multiple filters
+
 def searchOrdersForInvoice(request):
     customer = ''
-    startDate  = ''
-    endDate = ''
+    selected_days = ''
 
     if request.GET.get('search_customer'):
         customer = request.GET.get('search_customer')
 
-    if request.GET.get('search_startDate'):
-        startDate = request.GET.get('search_startDate')
+    if request.GET.get('selected_days'):
+        selected_days = request.GET.get('selected_days')
 
-    if request.GET.get('search_endDate'):
-        endDate = request.GET.get('search_endDate')
+    if selected_days == '1': # today
+        startDate = datetime.now().date()
+    elif selected_days == '7': # last 7 days
+        startDate = datetime.now().date() - timedelta(days=7)
+    elif selected_days == '30':  # last 30 days
+        startDate = datetime.now().date() - timedelta(days=30)
+    else: # all days
+        startDate = datetime.now().date() - timedelta(days=999)
 
-    #orders = Order.objects.filter(flag=False)
+    endDate = datetime.now().date() + timedelta(days=1)
 
-    if customer == '':
-        orders = Order.objects.filter(flag=False)
-    else:
-        queryStr = 'SELECT * FROM products_order, products_customer WHERE products_order.customer_id = products_customer.id AND products_order.flag=false'
-        if customer != '':
-            queryStr += ' AND products_customer.firstname=' + '"' + customer + '"'
-        if startDate != '' and endDate != '' :
-            queryStr += ' AND transactionTime BETWEEN "' + startDate + '" AND "' + endDate + '"'
+    if customer == '': # customer field is empty
+        if selected_days == '0': # selected days is all days
+            orders = Order.objects.filter(flag=False)
+        else: # selected days either today, last 7 days, or last 30 days
+            orders = Order.objects.filter(Q(flag=False) & Q(transactionTime__range=[startDate, endDate]))
+    else: # customer field not empty
+        if selected_days == '0':
+            orders = Order.objects.filter(Q(flag=False) & (Q(customer__firstname__icontains=customer) | Q(customer__lastname__icontains=customer) | Q(customer__companyName__icontains=customer)))
+        else:
+            orders = Order.objects.filter(Q(flag=False) & Q(transactionTime__range=[startDate, endDate]) & (Q(customer__firstname__icontains=customer) | Q(customer__lastname__icontains=customer) | Q(customer__companyName__icontains=customer)))
+    return orders, customer, selected_days
 
-        orders = Order.objects.raw(queryStr)
-    return orders, customer, startDate, endDate
+

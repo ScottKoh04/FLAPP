@@ -85,14 +85,12 @@ def createQROrder(request):
     # https://flapp-app.herokuapp.com/create-QR-order/?productName=Guava&grade=AA&weight=40
     productName = request.GET.get('productName')
     grade = request.GET.get('grade')
-
     weight = request.GET.get('weight')
     product = Product.objects.get(Q(productName=productName) & Q(grade=grade))
 
     order = Order()
     order.product = product
     order.weight = weight
-    order.save()
 
     form = OrderForm(instance=order)
 
@@ -223,8 +221,8 @@ def generateInvoices(request):
 
     # search for orders to generate invoice
     else:
-        orders, customer, startDate, endDate = searchOrdersForInvoice(request)
-        context = {'orders': orders, 'customer': customer, 'startDate': startDate, 'endDate': endDate}
+        orders, customer, selected_days = searchOrdersForInvoice(request)
+        context = {'orders': orders, 'customer': customer, 'selected_days':selected_days}
         return render(request, 'generateInvoices.html', context)
 
 @login_required(login_url='login')

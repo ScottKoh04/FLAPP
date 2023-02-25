@@ -16,7 +16,7 @@ class OrderForm(ModelForm):
 class CustomerForm(ModelForm):
     class Meta:
         model = Customer
-        fields = ['firstname', 'lastname', 'phone', 'email', 'address', 'companyName', 'companyPhone', 'companyAddress', 'city', 'state', 'postcode', 'tier']
+        fields = ['firstname', 'lastname', 'phone', 'email', 'deliveryAddress', 'companyName', 'companyPhone', 'companyAddress', 'city', 'state', 'postcode', 'tier']
         widgets = {
             'tier': forms.RadioSelect()
         }

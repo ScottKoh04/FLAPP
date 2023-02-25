@@ -40,7 +40,7 @@ class Customer(models.Model):
     )
     firstname = models.CharField(max_length=50, null=True)
     lastname = models.CharField(max_length=50, null=True)
-    address = models.CharField(max_length=200, null=True, default='N/A')
+    deliveryAddress = models.CharField(max_length=200, null=True, default='N/A')
     phone_regex = RegexValidator(regex=r'^\d{3}\d{3}\d{4}$')
     phone = models.CharField(null=True, max_length=30, validators=[phone_regex])
     email = models.EmailField(null=True, validators=[validators.EmailValidator()])

@@ -30,9 +30,9 @@
     <br>
 <table>
     <tr>
-        <td></td>
-        <td><h3>Fong Lim Enterprise Sdn Bhd (0415905T)</h3></td>
         <td><h1>Invoice</h1></td>
+        <td><h3>Fong Lim Enterprise Sdn Bhd (0415905T)</h3></td>
+        <td></td>
     </tr>
     <tr>
         <td></td>
@@ -40,9 +40,9 @@
         <td></td>
     </tr>
 <tr>
-        <td>&nbsp;</td>
-        <td>Taiping 34000 Perak</td>
         <td>Invoice No: {{ invoice.id }}</td>
+        <td>Taiping 34000 Perak</td>
+        <td></td>
     </tr>
     <tr>
         <td></td>
@@ -50,35 +50,40 @@
         <td></td>
     </tr>
     <tr>
-        <td></td>
-        <td></td>
         <td>Date: {{ invoice.timeGenerated.date }}</td>
+        <td></td>
+        <td></td>
     </tr>
     <tr>
+        <td></td>
+        <td><h4>Customer</h4></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
         <td>Contact Person: {{ invoice.customer }}</td>
         <td>{{ invoice.customer.companyName }}</td>
-        <td></td>
     </tr>
     <tr>
+        <td></td>
         <td>Contact No.: {{ invoice.customer.phone }}</td>
         <td>Company Phone: {{ invoice.customer.companyPhone }}</td>
-        <td></td>
     </tr>
     <tr>
+        <td></td>
         <td>Email: {{ invoice.customer.email }}</td>
-        <td>Address: {{ invoice.customer.companyAddress }}</td>
-        <td></td>
+        <td>Company Address: {{ invoice.customer.companyAddress }}</td>
     </tr>
     <tr>
-        <td>&nbsp;</td>
+        <td></td>
         <td>{{ invoice.customer.city }} {{ invoice.customer.postcode }} {{ invoice.customer.state }}</td>
-        <td> </td>
+        <td></td>
     </tr>
     <tr>
         <td>&nbsp</td>
     </tr>
     <tr>
-        <td colspan="3">Delivery Address: {{ invoice.customer.address}}</td>
+        <td colspan="3">Delivery Address: {{ invoice.customer.deliveryAddress}}</td>
     </tr>
 </table>
 
