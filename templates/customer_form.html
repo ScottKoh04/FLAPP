@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
 
 {% block content %}
+
 <main class="formPage my-xl">
     <div class="content-box">
         <div class="formWrapper">
@@ -10,6 +11,7 @@
             <form class="form" method="POST">
                 {% csrf_token %}
 
+                <!-- displaying form -->
                 {% for field in form %}
                 <div class="form__field">
                     <label for="formInput#text">{{ field.label}}: </label>
@@ -23,4 +25,5 @@
         </div>
     </div>
 </main>
+
 {% endblock content %}

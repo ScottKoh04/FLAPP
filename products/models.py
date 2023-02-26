@@ -1,5 +1,7 @@
-import phonenumber_field.validators
 from django.db import models
+
+# validators
+import phonenumber_field.validators
 from django.core import validators
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
@@ -14,7 +16,7 @@ class User(models.Model):
     username = models.CharField(max_length=50, null=True)
     password = models.CharField(max_length=50, null=True)
     accountType = models.CharField(max_length=50, null=True)
-    def __str__(self):
+    def __str__(self):  # string returned when object is referenced
         return self.firstname + ' ' + self.lastname
 
 class Customer(models.Model):
@@ -32,15 +34,16 @@ class Customer(models.Model):
         ('Sarawak', 'Sarawak'),
         ('Selangor', 'Selangor'),
         ('Terengganu', 'Terengganu'),
-        )
+        )  # choices for 'state' attribute
     TIERS = (
         ('1', 'Tier 1'),
         ('2', 'Tier 2'),
         ('3', 'Market'),
-    )
+    )  # choices for 'tier' attribute
     firstname = models.CharField(max_length=50, null=True)
     lastname = models.CharField(max_length=50, null=True)
     deliveryAddress = models.CharField(max_length=200, null=True, default='N/A')
+    # phone validator for a 10-digit string - groups of 3,3,4 digits.
     phone_regex = RegexValidator(regex=r'^\d{3}\d{3}\d{4}$')
     phone = models.CharField(null=True, max_length=30, validators=[phone_regex])
     email = models.EmailField(null=True, validators=[validators.EmailValidator()])
@@ -52,12 +55,13 @@ class Customer(models.Model):
     postcode = models.IntegerField(null=True)
     tier = models.CharField(max_length=10, choices=TIERS, default='3')
 
+    # defines a read-only attribute of the model which can then be accessed elsewhere
     @property
     def fullname(self):
         return f"{self.firstname} {self.lastname}"
     def __str__(self):
         return f"{self.firstname} {self.lastname}"
-    class Meta:
+    class Meta: # orders entries by firstname ASC
         ordering = ['firstname']
 class Product(models.Model):
     GRADES = (
@@ -74,15 +78,19 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.productName} {self.grade}"
 
+    class Meta:
+        ordering = ['productName', '-unitPrice']
 
 class Invoice(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True)
+    # protects customer instance from being deleted
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    # protects user instance from being deleted
     timeGenerated = models.DateTimeField(auto_now_add=True)
     grandTotal = models.FloatField(null=True)
     discountedTotal = models.FloatField(null=True)
     class Meta:
-        ordering = ['-id']
+        ordering = ['-id']  # order starting with latest
 
 class Order(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.SET_NULL, null=True)
@@ -90,6 +98,7 @@ class Order(models.Model):
     transactionTime = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     weight = models.IntegerField(null=True)
+    # flag highlights whether an order is already part of an invoice (one order only linked to one invoice)
     flag = models.BooleanField(default=False)
     discount = models.FloatField(default=1)
     @property

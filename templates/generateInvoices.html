@@ -1,77 +1,76 @@
 {% extends 'main.html' %}
 
 {% block content %}
-  <!-- Main Section -->
-  <main class="projects">
+<main class="projects">
     <section class="hero-section text-center">
-      <div class="container container--narrow">
-        <div class="hero-section__box">
-          <h2>Generate <span>Invoice</span></h2>
-        </div>
+        <div class="container container--narrow">
+            <div class="hero-section__box">
+                <h2>Generate <span>Invoice</span></h2>
+            </div>
 
-        <div class="hero-section__search">
-          <form method="get">
+            <div class="hero-section__search">
+              <form method="get">
 
-              <input style="height: 40px;" size="25" type="text" name="search_customer" value="{{ customer }}" placeholder="Customer or Company"/>
-              &nbsp;Date <select style="height: 40px;" name="selected_days" >
-                      <option value="1" {% if selected_days == '1' %} selected {% endif %}>Today</option>
-                      <option value="7" {% if selected_days == '7' %} selected {% endif %}>Last 7 Days</option>
-                      <option value="30" {% if selected_days == '30' %} selected {% endif %}>Last 30 Days</option>
-                      <option value="999" {% if selected_days == '999' %} selected {% endif %}>All Days</option>
-                   </select>
-            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
-          </form>
+                  <input style="height: 40px;" size="25" type="text" name="search_customer" value="{{ customer }}" placeholder="Customer or Company"/>
+                  &nbsp;Date <select style="height: 40px;" name="selected_days" >
+                          <option value="1" {% if selected_days == '1' %} selected {% endif %}>Today</option>
+                          <option value="7" {% if selected_days == '7' %} selected {% endif %}>Last 7 Days</option>
+                          <option value="30" {% if selected_days == '30' %} selected {% endif %}>Last 30 Days</option>
+                          <option value="999" {% if selected_days == '999' %} selected {% endif %}>All Days</option>
+                       </select>
+                <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+              </form>
+            </div>
         </div>
-      </div>
     </section>
 
-
-  <br>
-      <div class="align-center"><button class="btn btn-secondary" type="submit">Generate Invoice</button></div>
-  <br>
-  <form action="" method="POST">
+    <br>
+    <div class="align-center"><button class="btn btn-secondary" type="submit">Generate Invoice</button></div>
+    <br>
+    <form action="" method="POST">
       {% csrf_token %}
 
-      <table class="table table-striped table-hover table-bordered">
-  <thead>
-    <tr class="align-center">
-        <th>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="select-all" onchange="selectAllOrders(this)">
-                <label for="select-all"></label>
-            </div>
-        </th>
-      <th>Order No.</th>
-      <th>Transaction Time</th>
-      <th>Customer Name</th>
-      <th>Product</th>
-      <th class="align-numeric">Weight</th>
-      <th class="align-numeric">Total</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for order in orders %}
-                <tr class="align-center">
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="{{ order.id }}" id="{{ order.id }}" name="boxes">
-                            <label for="{{ order.id }}"></label>
-                        </div>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr class="align-center">
+            <th>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="select-all" onchange="selectAllOrders(this)">
+                    <label for="select-all"></label>
+                </div>
+            </th>
+            <th>Order No.</th>
+            <th>Transaction Time</th>
+            <th>Customer Name</th>
+            <th>Product</th>
+            <th class="align-numeric">Weight</th>
+            <th class="align-numeric">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+        <tr class="align-center">
+            <td>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="{{ order.id }}" id="{{ order.id }}" name="boxes">
+                    <label for="{{ order.id }}"></label>
+                </div>
 
-                    </td>
-                    <td>{{ order}}</td>
-                    <td>{{ order.transactionTime }}</td>
-                    <td>{{ order.customer }}</td>
-                    <td>{{ order.product }}</td>
-                    <td class="align-numeric">{{ order.weight }}</td>
-                    <td class="align-numeric">{{ order.discountedTotal}}</td>
-                </tr>
-            {% endfor %}
-  </tbody>
-</table>
+            </td>
+            <td>{{ order}}</td>
+            <td>{{ order.transactionTime }}</td>
+            <td>{{ order.customer }}</td>
+            <td>{{ order.product }}</td>
+            <td class="align-numeric">{{ order.weight }}</td>
+            <td class="align-numeric">{{ order.discountedTotal}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
     {% include 'pagination.html' with queryset=orders custom_range=custom_range %}
-  </form>
+
+    </form>
 </main>
 
 {% endblock content %}

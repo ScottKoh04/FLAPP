@@ -1,6 +1,8 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
+
+<!-- search bar -->
 <main class="projects">
     <section class="hero-section text-center">
     <div class="container container--narrow">
@@ -23,7 +25,9 @@
       </div>
     </div>
   </section>
-<br>
+
+    <!-- customer table -->
+    <br>
     <table class="table table-striped table-hover table-bordered">
         <tr class="align-center">
             <th>Customer Name</th>
@@ -31,7 +35,6 @@
             <th>Email</th>
             <th>Company Name</th>
             <th class="align-numeric">Company Phone</th>
-            <!--<th>Company Address</th>-->
             <th>Tier</th>
             <th class="align-center" colspan="2">Actions</th>
         </tr>
@@ -42,7 +45,6 @@
                 <td>{{ customer.email }}</td>
                 <td>{{ customer.companyName }}</td>
                 <td class="align-numeric">{{ customer.companyPhone }}</td>
-                <!--<td>{{ customer.companyAddress }}</td>-->
                 <td>{{ customer.tier }}</td>
                 <td class="align-center"><a href="{% url 'retrieve-customer' customer.id %}"><img src="{% static 'images/view-icon.svg' %}" ></a></td>
                 <td class="align-center"><a href="{% url 'update-customer' customer.id %}"><img src="{% static 'images/edit-icon.svg' %}" ></a></td>
@@ -54,7 +56,8 @@
 
     <br>
 
-        {% include 'pagination.html' with queryset=customers custom_range=custom_range %}
+    <!-- paginator -->
+    {% include 'pagination.html' with queryset=customers custom_range=custom_range %}
 
 
 </main>

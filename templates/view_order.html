@@ -2,27 +2,27 @@
 
 {% block content %}
 
- <!-- Main Section -->
-    <main class="formPage my-xl">
-        <div class="content-box">
-            <div class="formWrapper">
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
 
-                <br>
-                <h1>View Order</h1>
-                <form class="form" method="POST">
-                    {% csrf_token %}
+            <br>
+            <h1>View Order</h1>
+            <form class="form" method="POST">
+                {% csrf_token %}
 
-                    {% for field in form %}
-                    <div class="form__field">
-                        <label for="formInput#text">{{ field.label}}: </label>
-                            {{ field }}
+                {% for field in form %}
+                <div class="form__field">
+                    <label for="formInput#text">{{ field.label}}: </label>
+                        {{ field }}
 
-                    </div>
-                    {% endfor %}
+                </div>
+                {% endfor %}
 
-                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Back" onclick="history.back()"/>
-                </form>
-            </div>
+                <input class="btn btn--sub btn--lg  my-md" type="button" value="Back" onclick="history.back()"/>
+            </form>
         </div>
-    </main>
+    </div>
+</main>
+
 {% endblock content %}

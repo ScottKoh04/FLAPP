@@ -1,7 +1,8 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <br>
+<br>
+
 <table>
     <tr>
         <td></td>
@@ -13,7 +14,7 @@
         <td>No. 294, Jalan Machang, Kg.jamb</td>
         <td></td>
     </tr>
-<tr>
+    <tr>
         <td>&nbsp;</td>
         <td>Taiping 34000 Perak</td>
         <td>Invoice No: {{ invoice.id }}</td>
@@ -67,20 +68,21 @@
         <th align="left">Unit Price</th>
         <th align="right">Subtotal</th>
     </tr>
-        <!--loop through all orders in invoice-->
-{% for order in orders %}
-                <tr>
-                    <td align="left">{{ order.weight }}</td>
-                    <td align="left">{{ order.product.grade }}</td>
-                    <td align="left">{{ order.product }}</td>
-                    <td align="left">{{ order.product.unitPrice }}</td>
-                    <td align="right">RM {{ order.subtotal}}</td>
-                    </tr>
-            {% endfor %}
-        <!-- end loop -->
-
+    <!--loop through all orders in invoice-->
+    {% for order in orders %}
+    <tr>
+        <td align="left">{{ order.weight }}</td>
+        <td align="left">{{ order.product.grade }}</td>
+        <td align="left">{{ order.product }}</td>
+        <td align="left">{{ order.product.unitPrice }}</td>
+        <td align="right">RM {{ order.subtotal}}</td>
+    </tr>
+    {% endfor %}
+    <!-- end loop -->
 </table>
+
 <hr>
+
 <table>
     <tr>
         <th>&nbsp;</th>
@@ -90,12 +92,14 @@
         <th align="right">RM {{ invoice.grandTotal }}</th>
     </tr>
 </table>
+
 <hr>
-<br>
+
+    <br>
     <br>
     <br>
 
-    <table>
+<table>
     <tr>
         <td>Company Chop</td>
     </tr>
@@ -104,6 +108,6 @@
         <td><br>This is a computer generated invoice, no signature is required.</td>
         <td>&nbsp;</td>
     </tr>
+</table>
 
-    </table>
 {% endblock %}

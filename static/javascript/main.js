@@ -1,3 +1,4 @@
+//making the select all button
 let checkboxes = document.querySelectorAll("input[type = 'checkbox']");
 function selectAllOrders(myCheckbox){
     if(myCheckbox.checked == true){

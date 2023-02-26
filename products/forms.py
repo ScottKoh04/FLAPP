@@ -1,8 +1,7 @@
+from .models import Order, Customer, Product
+#django forms
 from django.forms import ModelForm
 from django import forms
-from .models import Order, Customer, Product
-
-from django.core import validators
 
 #forms for making new entries to models
 class OrderForm(ModelForm):

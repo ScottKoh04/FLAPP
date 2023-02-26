@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect
+from django.template import RequestContext
+
 from .models import Order, User, Product, Customer, Invoice
 from django.db.models import Q
 from .forms import OrderForm, CustomerForm, ProductForm
+from .utilities import searchItems, paginateItems, searchOrdersForInvoice, assigningDiscount
+
+from datetime import date, datetime, timedelta
+
+# for login logout features
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .utilities import searchItems, paginateItems, searchOrdersForInvoice
-from django.template import RequestContext
-
-from datetime import date, datetime, timedelta
 
 # for converting html page to pdf
 from io import BytesIO
@@ -18,17 +21,20 @@ from xhtml2pdf import pisa
 from django.views.generic import ListView
 from django.http import HttpResponse
 
-import random
+# for graphing
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 
 # Create your views here.
+
+# logging in
 def loginUser(request):
     if request.user.is_authenticated:
         return redirect('home')
 
+    # validating username and password entered
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -47,15 +53,19 @@ def loginUser(request):
             messages.error(request, 'Username or password is incorrect')
 
     return render(request, "login.html")
-@login_required(login_url='login')
+
+# logging out
+@login_required(login_url='login')  # page can only be seen if user is logged in
 def logoutUser(request):
     logout(request)
     messages.info(request, 'User was logged out!')
     return redirect('login')
 
+# render basic home page
 def home(request):
     return render(request, 'home.html')
 
+# displays orders filtered by search and paginated
 @login_required(login_url='login')
 def orders(request):
     orders, search_query = searchItems(request, 'search_order')
@@ -63,76 +73,85 @@ def orders(request):
     context = {'orders': orders, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'orders.html', context)
 
+# create new order form
 @login_required(login_url='login')
 def createOrder(request):
+    # generates empty form
     form = OrderForm()
 
+    # user fills up form and submits
     if request.method == 'POST':
         form = OrderForm(request.POST)
+        # saves form once all fields are valid
         if form.is_valid():
             order = form.save()
-            if order.customer.tier == '1':
-                Order.objects.filter(pk=order.pk).update(discount=0.8)
-            elif order.customer.tier == '2':
-                Order.objects.filter(pk=order.pk).update(discount=0.9)
+            # assigning discount to order based on customer tier (function imported from utilities)
+            assigningDiscount(order)
             return redirect('orders')
+
     context = {'form': form}
     return render(request, "order_form.html", context)
 
+# creates new order via QR code - once scanned, form is prefilled with data from QR code
 @login_required(login_url='login')
 def createQROrder(request):
-    # example url qr code
+    # example url encoded in qr code
     # https://flapp-app.herokuapp.com/create-QR-order/?productName=Guava&grade=AA&weight=40
+    # only works provided user is logged in already, or else link will redirect to login
+
+    # extracts data from url based on QR code
     productName = request.GET.get('productName')
     grade = request.GET.get('grade')
     weight = request.GET.get('weight')
+    # finds product object in database
     product = Product.objects.get(Q(productName=productName) & Q(grade=grade))
 
+    # creates new order, assigns values extracted
     order = Order()
     order.product = product
     order.weight = weight
 
+    # produces prefilled order form, allows users to input customer or make changes, saves form once valid
     form = OrderForm(instance=order)
 
     if request.method == 'POST':
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
             order = form.save()
-            if order.customer.tier == '1':
-                Order.objects.filter(pk=order.pk).update(discount=0.8)
-            elif order.customer.tier == '2':
-                Order.objects.filter(pk=order.pk).update(discount=0.9)
+            assigningDiscount(order)
             return redirect('orders')
     context = {'form':form}
     return render(request, "order_form.html", context)
+
 @login_required(login_url='login')
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_superuser)  # page can only be accessed by superusers
 def updateOrder(request, pk):
+    # finds single order which matches selected pk
     order = Order.objects.get(id=pk)
+    # displays original saved form
     form = OrderForm(instance=order)
 
+    # saves updates to form
     if request.method == 'POST':
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
             order = form.save()
-            if order.customer.tier == '1':
-                Order.objects.filter(pk=order.pk).update(discount=0.8)
-            elif order.customer.tier == '2':
-                Order.objects.filter(pk=order.pk).update(discount=0.9)
+            assigningDiscount(order)
             return redirect('orders')
 
     context = {'form': form}
     return render(request, "order_form.html", context)
+
+# allows user to view orders
 @login_required(login_url='login')
 def retrieveOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
 
-    if request.method == 'POST':
-        form = OrderForm(request.POST, instance=order)
-
     context = {'form': form}
     return render(request, "view_order.html", context)
+
+# delete order
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def deleteOrder(request, pk):
@@ -144,6 +163,8 @@ def deleteOrder(request, pk):
         return redirect('orders')
     context = {'form':form}
     return render(request, 'delete_order.html', context)
+
+# displays invoices filtered by search and paginated
 @login_required(login_url='login')
 def invoices(request):
     invoices, search_query = searchItems(request, 'search_invoice')
@@ -154,23 +175,29 @@ def invoices(request):
 class InvoiceListView(ListView):
     model = Invoice
     template_name = 'invoices.html'
+
+# generating pdf for viewing invoices using xhtml2pdf library
 @login_required(login_url='login')
 # sample code from xhtml2pdf's documentation
 def render_pdf_view(request, *args, **kwargs):
+    # finds relevant invoice and its orders
     pk = kwargs.get('pk')
     invoice = Invoice.objects.get(pk=pk)
     orders = Order.objects.filter(invoice=pk)
 
+    # calculate the amount of discount applied in format XX%
     percentDiscount = str(round((1-orders[0].discount)*100))+'%'
+
     context = {'orders': orders, 'invoice': invoice, 'percentDiscount':percentDiscount}
+
     template_path = 'pdfInvoice.html'
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
 
-    #to download
-    #response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    # to download
+    # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
 
-    #to display
+    # to display (for now)
     response['Content-Disposition'] = 'filename="invoice.pdf"'
 
     # find the template and render it.
@@ -186,18 +213,22 @@ def render_pdf_view(request, *args, **kwargs):
        return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
 
+# generate invoice page - filter orders, and allow new invoice to be created
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def generateInvoices(request):
-    # generate actual invoice
+    # gets all selected orders
     if request.method == "POST":
         id_list = request.POST.getlist('boxes')
         orders = [Order.objects.get(id=id) for id in id_list]
 
+        # customer for invoice will just be customer of first order selected
+        # will need to improve on this later
+        # for now I assume user will create invoices with orders all from the same customer
         mainOrder = orders[0]
         customer = mainOrder.customer
 
-        # create new invoice and assign customer with customer of first order (assume user will create invoices with orders from same customer)
+        # create new invoice and assign customer with customer of first order
         invoice = Invoice()
         invoice.customer = customer
 
@@ -207,8 +238,11 @@ def generateInvoices(request):
             grandTotal += order.subtotal
         invoice.grandTotal = grandTotal
 
+        # calculate discounted total
         discountedTotal = grandTotal * mainOrder.discount
         invoice.discountedTotal = discountedTotal
+
+        # save invoice
         invoice.save()
 
         # update flag to false once order has been assigned to an invoice
@@ -219,18 +253,20 @@ def generateInvoices(request):
         messages.success(request, ("Invoice generated successfully"))
         return redirect('invoices')
 
-    # search for orders to generate invoice
+    # filter orders based on customer and time frame
     else:
         orders, customer, selected_days = searchOrdersForInvoice(request)
         context = {'orders': orders, 'customer': customer, 'selected_days':selected_days}
         return render(request, 'generateInvoices.html', context)
 
+# similar to orders
 @login_required(login_url='login')
 def products(request):
     products, search_query = searchItems(request, 'search_product')
     custom_range, products = paginateItems(request, products)
     context = {'products': products, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'products.html', context)
+
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def createProduct(request):
@@ -244,6 +280,7 @@ def createProduct(request):
             return redirect('products')
     context = {'form': form}
     return render(request, "product_form.html", context)
+
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def updateProduct(request, pk):
@@ -259,6 +296,10 @@ def updateProduct(request, pk):
     context = {'form': form}
     return render(request, "product_form.html", context)
 
+# no view single product as all fields can be clearly seen in table already
+# no delete product as product object needs to be protected (and is quite a rare occasion)
+
+# similar to orders as well
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def customers(request):
@@ -266,6 +307,7 @@ def customers(request):
     custom_range, customers = paginateItems(request, customers)
     context = {'customers': customers, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'customers.html', context)
+
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def createCustomer(request):
@@ -286,11 +328,9 @@ def retrieveCustomer(request, pk):
     customer = Customer.objects.get(id=pk)
     form = CustomerForm(instance=customer)
 
-    if request.method == 'POST':
-        form = CustomerForm(request.POST, instance=customer)
-
     context = {'form': form}
     return render(request, "view_customer.html", context)
+
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def updateCustomer(request, pk):
@@ -317,50 +357,62 @@ def deleteCustomer(request, pk):
     context = {'form':form}
     return render(request, 'delete_customer.html', context)
 
+# the reports page
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def reports(request):
+    # get current date and figure out tomorrow's date, and the date of the start of the year
     today = datetime.now().date()
     tomorrow = datetime.now().date() + timedelta(days=1)
     startOfYear = today.replace(month=1, day=1)
 
+    # assigning revenues
     dailyRevenue = 0
     monthlyRevenue = 0
     yearlyRevenue = 0
 
     orders = Order.objects.filter(transactionTime__range=[startOfYear, tomorrow])
     for order in orders:
+        # for daily
         if order.transactionTime.day == today.day and order.transactionTime.month == today.month and order.transactionTime.year == today.year:
             dailyRevenue += order.subtotal
+        # for monthly
         if order.transactionTime.month == today.month and order.transactionTime.year == today.year:
             monthlyRevenue += order.subtotal
+        # for yearly
         if order.transactionTime.year == today.year:
             yearlyRevenue += order.subtotal
 
+    # calculating date 30 days ago
     monthToDate = tomorrow - timedelta(days=30)
+
+    # function returns every single day between given range
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
+    # making the daily revenue chart using matplotlib
     def dailyRevenuesChart():
-        days = []
-        revenues = []
-        for singleDay in daterange(monthToDate, tomorrow):
-            days.append(singleDay.strftime("%m-%d"))
-            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
+        days = []  # x-axis
+        revenues = []  # y-axis
 
+        # assigning data to chart
+        for singleDay in daterange(monthToDate, tomorrow):
+            # assigning data to x-axis
+            days.append(singleDay.strftime("%m-%d"))
+
+            # assigning data to y-axis
+            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
             dayRevenue = 0
             for order in orders:
                 dayRevenue += order.discountedTotal()
             revenues.append(dayRevenue)
 
-        # create a figure and a subplot
+        # creating the graph
         fig, ax = plt.subplots()
 
-        # plot the data as a line
         ax.bar(days, revenues)
 
-        # set the title and axis labels
         ax.set_title('30 Days - Daily Revenues')
         ax.set_xlabel('Date')
         ax.set_ylabel('Revenue')
@@ -372,28 +424,28 @@ def reports(request):
 
         ax.tick_params(axis='y', which='major', labelsize=6)
 
+        # saving graph as png in static folder
         plt.savefig('static/charts/daily-revenues.png')
 
     dailyRevenuesChart()
+
+    # making the daily sales numbers chart using matplotlib
     def dailySalesChart():
         days = []
         sales = []
         for singleDay in daterange(monthToDate, tomorrow):
             days.append(singleDay.strftime("%m-%d"))
-            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
 
+            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
             daySales = 0
             for order in orders:
                 daySales += order.weight
             sales.append(daySales)
 
-        # create a figure and a subplot
         fig, ax = plt.subplots()
 
-        # plot the data as a line
         ax.bar(days, sales)
 
-        # set the title and axis labels
         ax.set_title('30 Days - Daily Sales')
         ax.set_xlabel('Date')
         ax.set_ylabel('Sales')
@@ -409,8 +461,11 @@ def reports(request):
 
     dailySalesChart()
 
+    # finding the top customers by revenue (last 30 days)
     def listOfTopCustomers():
         customers = {}
+
+        # calculating total spending by each customer in last 30 days and adding to dictionary
         orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
         for order in orders:
             if order.customer not in customers:
@@ -418,16 +473,18 @@ def reports(request):
             elif order.customer in customers:
                 customers[order.customer] += order.subtotal
 
+        # sorting dict in descending order - greatest spenders first
         sorted_customers = dict(sorted(customers.items(), key=lambda item: item[1], reverse=True))
 
         topCustomers = {}
-        # return top 10 customers
+        # return top 10 customers from sorted dict
         for key in list(sorted_customers.keys())[:10]:
             topCustomers[key] = sorted_customers[key]
         return topCustomers
 
     topCustomers = listOfTopCustomers()
 
+    # finding the top products by revenue (last 30 days)
     def listOfTopProducts():
         products = {}
         orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
@@ -447,20 +504,26 @@ def reports(request):
 
     topProducts = listOfTopProducts()
 
+    # plotting a pie chart for top customers
     def topCustomersChart():
+        # separating top customers dictionary into list of keys and values
+        # keys represent lables, values represent portion of pie
         topCustomersList = list(topCustomers.keys())
         totalRevenues = list(topCustomers.values())
 
+        # creating piechart using matplotlib
         fig1, ax1 = plt.subplots()
         ax1.pie(totalRevenues, labels=topCustomersList, autopct='%1.1f%%', startangle=90)
         ax1.axis('equal')
 
         plt.title('Top Customers By Revenue')
 
+        # saving piechart as png
         plt.savefig('static/charts/top-customers.png')
 
     topCustomersChart()
 
+    # plotting a pie chart for top products
     def topProductsChart():
         topProductsList = list(topProducts.keys())
         totalRevenues = list(topProducts.values())

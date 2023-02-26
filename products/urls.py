@@ -8,10 +8,12 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("login/", views.loginUser, name="login"),
     path("logout/", views.logoutUser, name="logout"),
+    # original url: (e.g) flapp-app.herokuapp.com
     path("", views.home, name="home"),
 
     path("products/", views.products, name="products"),
     path('create-product/', views.createProduct, name="create-product"),
+    # <str:pk> returns page for specific product id
     path('update-product/<str:pk>/', views.updateProduct, name="update-product"),
 
     path("orders/", views.orders, name="orders"),

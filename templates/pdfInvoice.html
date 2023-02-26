@@ -1,7 +1,6 @@
 {% load static %}
 
 <head>
-
 <style>
     @page {
         size: a4 portrait;
@@ -21,133 +20,134 @@
 </head>
 
 <body>
-
     <!-- Content for Static Frame 'footer_frame' -->
     <div id="footer_content">(c) - page <pdf:pagenumber>
         of <pdf:pagecount>
     </div>
 
     <br>
-<table>
-    <tr>
-        <td><h1>Invoice</h1></td>
-        <td><h3>Fong Lim Enterprise Sdn Bhd (0415905T)</h3></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>No. 294, Jalan Machang, Kg. Jambu</td>
-        <td></td>
-    </tr>
-<tr>
-        <td>Invoice No: {{ invoice.id }}</td>
-        <td>Taiping 34000 Perak</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>Phone: 05-808 4580</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Date: {{ invoice.timeGenerated.date }}</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td><h4>Customer</h4></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>Contact Person: {{ invoice.customer }}</td>
-        <td>{{ invoice.customer.companyName }}</td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>Contact No.: {{ invoice.customer.phone }}</td>
-        <td>Company Phone: {{ invoice.customer.companyPhone }}</td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>Email: {{ invoice.customer.email }}</td>
-        <td>Company Address: {{ invoice.customer.companyAddress }}</td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>{{ invoice.customer.city }} {{ invoice.customer.postcode }} {{ invoice.customer.state }}</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp</td>
-    </tr>
-    <tr>
-        <td colspan="3">Delivery Address: {{ invoice.customer.deliveryAddress}}</td>
-    </tr>
-</table>
+
+    <table>
+        <tr>
+            <td><h1>Invoice</h1></td>
+            <td><h3>Fong Lim Enterprise Sdn Bhd (0415905T)</h3></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>No. 294, Jalan Machang, Kg. Jambu</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Invoice No: {{ invoice.id }}</td>
+            <td>Taiping 34000 Perak</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Phone: 05-808 4580</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Date: {{ invoice.timeGenerated.date }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><h4>Customer</h4></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Contact Person: {{ invoice.customer }}</td>
+            <td>{{ invoice.customer.companyName }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Contact No.: {{ invoice.customer.phone }}</td>
+            <td>Company Phone: {{ invoice.customer.companyPhone }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Email: {{ invoice.customer.email }}</td>
+            <td>Company Address: {{ invoice.customer.companyAddress }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>{{ invoice.customer.city }} {{ invoice.customer.postcode }} {{ invoice.customer.state }}</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp</td>
+        </tr>
+        <tr>
+            <td colspan="3">Delivery Address: {{ invoice.customer.deliveryAddress}}</td>
+        </tr>
+    </table>
 
     <br>
     <hr>
 
-<table>
-    <tr>
-        <th align="left">Quantity</th>
-        <th align="left">Code</th>
-        <th align="left">Description</th>
-        <th align="left">Unit Price</th>
-        <th align="right">Subtotal</th>
-    </tr>
+    <table>
+        <tr>
+            <th align="left">Quantity</th>
+            <th align="left">Code</th>
+            <th align="left">Description</th>
+            <th align="left">Unit Price</th>
+            <th align="right">Subtotal</th>
+        </tr>
         <!--loop through all orders in invoice-->
-{% for order in orders %}
-                <tr>
-                    <td align="left">{{ order.weight }}kg</td>
-                    <td align="left">{{ order.product.grade }}</td>
-                    <td align="left">{{ order.product }}</td>
-                    <td align="left">{{ order.product.unitPrice }}</td>
-                    <td align="right">RM {{ order.subtotal }}</td>
-                    </tr>
-            {% endfor %}
+        {% for order in orders %}
+        <tr>
+            <td align="left">{{ order.weight }}kg</td>
+            <td align="left">{{ order.product.grade }}</td>
+            <td align="left">{{ order.product }}</td>
+            <td align="left">{{ order.product.unitPrice }}</td>
+            <td align="right">RM {{ order.subtotal }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
-</table>
-<hr>
-<table>
-    <tr>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th align="left">Total: </th>
-        <th align="right">RM {{ invoice.grandTotal }}</th>
-    </tr>
-    <tr>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th align="left">Discount: </th>
-        <th align="right">{{ percentDiscount }}</th>
-    </tr>
-    <tr>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th align="left">Grand Total: </th>
-        <th align="right">RM {{ invoice.discountedTotal }}</th>
-    </tr>
-</table>
-<hr>
-<br>
+    <hr>
+
+    <table>
+        <tr>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th align="left">Total: </th>
+            <th align="right">RM {{ invoice.grandTotal }}</th>
+        </tr>
+        <tr>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th align="left">Discount: </th>
+            <th align="right">{{ percentDiscount }}</th>
+        </tr>
+        <tr>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th align="left">Grand Total: </th>
+            <th align="right">RM {{ invoice.discountedTotal }}</th>
+        </tr>
+    </table>
+
+    <hr>
+    <br>
     <br>
     <br>
 
     <table>
-    <tr>
-        <td>Company Chop</td>
-    </tr>
+        <tr>
+            <td>Company Chop</td>
+        </tr>
 
-    <tr>
-        <td><br>This is a computer generated invoice, no signature is required.</td>
-        <td>&nbsp;</td>
-    </tr>
-
+        <tr>
+            <td><br>This is a computer generated invoice, no signature is required.</td>
+            <td>&nbsp;</td>
+        </tr>
     </table>
 
