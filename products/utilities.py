@@ -42,7 +42,7 @@ def searchItems(request, search_type):
     elif search_type == 'search_product':
         products = Product.objects.distinct().filter(
             Q(productName__icontains=search_query) |
-            Q(product__grade__icontains=search_query)
+            Q(grade__icontains=search_query)
         )
         return products, search_query
 
