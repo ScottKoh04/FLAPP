@@ -869,6 +869,14 @@ img {
   margin-right: auto;
 }
 
+.tableReport {
+  width: 95%;
+  align-content: center;
+  table-layout: fixed;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .tableLanding {
   width: 50%;
   margin-top: auto;
