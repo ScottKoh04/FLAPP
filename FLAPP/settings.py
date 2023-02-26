@@ -83,6 +83,8 @@ WSGI_APPLICATION = "FLAPP.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# database configurations including user and password are stored in the os environment variable,
+# this is required for security reasons when application is deployed in the production server
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
