@@ -22,7 +22,10 @@ def searchItems(request, search_type):
     if search_type == 'search_order':
         orders = Order.objects.distinct().filter(
             Q(customer__firstname__icontains=search_query) |
-            Q(product__productName__icontains=search_query)
+            Q(customer__lastname__icontains=search_query) |
+            Q(customer__companyName__icontains=search_query) |
+            Q(product__productName__icontains=search_query) |
+            Q(product__grade__icontains=search_query)
         )
         return orders, search_query
 
@@ -38,7 +41,8 @@ def searchItems(request, search_type):
     # for products page
     elif search_type == 'search_product':
         products = Product.objects.distinct().filter(
-            Q(productName__icontains=search_query)
+            Q(productName__icontains=search_query) |
+            Q(product__grade__icontains=search_query)
         )
         return products, search_query
 
@@ -46,6 +50,7 @@ def searchItems(request, search_type):
     elif search_type == 'search_invoice':
         invoices = Invoice.objects.distinct().filter(
             Q(customer__firstname__icontains=search_query) |
+            Q(customer__lastname__icontains=search_query) |
             Q(customer__companyName__icontains=search_query)
         )
         return invoices, search_query
