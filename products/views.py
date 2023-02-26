@@ -383,6 +383,11 @@ def reports(request):
         if order.transactionTime.year == today.year:
             yearlyRevenue += order.subtotal
 
+    # round to two decimal places
+    dailyRevenue = round(dailyRevenue, 2)
+    monthlyRevenue = round(monthlyRevenue, 2)
+    yearlyRevenue = round(yearlyRevenue, 2)
+
     # calculating date 30 days ago
     monthToDate = tomorrow - timedelta(days=30)
 
