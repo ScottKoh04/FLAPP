@@ -86,11 +86,11 @@ WSGI_APPLICATION = "FLAPP.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'flappdb',
-        'USER': 'postgres',
-        'PASSWORD': 'djangokewl',
-        'HOST': 'database-1.cxrgxao6gzsu.us-east-1.rds.amazonaws.com',
-        'PORT': '5432'
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'USER': os.environ.get('DATABASE_USER'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'PORT': os.environ.get('DATABASE_PORT')
     }
 }
 
