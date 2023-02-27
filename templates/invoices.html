@@ -46,7 +46,7 @@
                         <td>{{ invoice.timeGenerated }}</td>
                         <td>{{ invoice.customer }}</td>
                         <td>{{ invoice.customer.companyName }}</td>
-                        <td class="align-numeric">{{ invoice.grandTotal }}</td>
+                        <td class="align-numeric">{{ invoice.discountedTotal }}</td>
                         <td class="align-center"><a href="{% url 'pdf_view' invoice.pk %}"><img src="{% static 'images/pdf-icon.svg' %}" ></a></td>
                     </tr>
                 {% endfor %}
