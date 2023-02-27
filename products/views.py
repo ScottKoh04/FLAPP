@@ -375,13 +375,13 @@ def reports(request):
     for order in orders:
         # for daily
         if order.transactionTime.day == today.day and order.transactionTime.month == today.month and order.transactionTime.year == today.year:
-            dailyRevenue += order.discountedTotal
+            dailyRevenue += order.discountedTotal()
         # for monthly
         if order.transactionTime.month == today.month and order.transactionTime.year == today.year:
-            monthlyRevenue += order.discountedTotal
+            monthlyRevenue += order.discountedTotal()
         # for yearly
         if order.transactionTime.year == today.year:
-            yearlyRevenue += order.discountedTotal
+            yearlyRevenue += order.discountedTotal()
 
     # round to two decimal places
     dailyRevenue = round(dailyRevenue, 2)
@@ -474,9 +474,9 @@ def reports(request):
         orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
         for order in orders:
             if order.customer not in customers:
-                customers.update({order.customer: order.discountedTotal})
+                customers.update({order.customer: order.discountedTotal()})
             elif order.customer in customers:
-                customers[order.customer] += order.discountedTotal
+                customers[order.customer] += order.discountedTotal()
 
         # sorting dict in descending order - greatest spenders first
         sorted_customers = dict(sorted(customers.items(), key=lambda item: item[1], reverse=True))
@@ -495,9 +495,9 @@ def reports(request):
         orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
         for order in orders:
             if order.product not in products:
-                products.update({order.product: order.discountedTotal})
+                products.update({order.product: order.discountedTotal()})
             elif order.product in products:
-                products[order.product] += order.discountedTotal
+                products[order.product] += order.discountedTotal()
 
         sorted_products = dict(sorted(products.items(), key=lambda item: item[1], reverse=True))
 
