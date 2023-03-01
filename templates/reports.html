@@ -16,8 +16,8 @@
         <td><h2>RM{{ yearlyRevenue }}</h2></td>
     </tr>
     <tr>
-        <td><img src="{% static 'charts/daily-revenues.png' %}" ></td>
-        <td><img src="{% static 'charts/top-customers.png' %}"></td>
+        <td><img src="data:image/png;base64, {{ chart_images.0.base64_image }}" alt="{{ chart.title }}"></td>
+        <td><img src="data:image/png;base64, {{ chart_images.2.base64_image }}" alt="{{ chart.title }}"></td>
         <td>
             <table class="tableReport">
                 <tr>
@@ -34,8 +34,8 @@
         </td>
     </tr>
     <tr>
-        <td><img src="{% static 'charts/daily-sales.png' %}" ></td>
-        <td><img src="{% static 'charts/top-products.png' %}"></td>
+        <td><img src="data:image/png;base64, {{ chart_images.1.base64_image }}" alt="{{ chart.title }}"></td>
+        <td><img src="data:image/png;base64, {{ chart_images.3.base64_image }}" alt="{{ chart.title }}"></td>
         <td>
             <table class="tableReport">
                 <tr>

@@ -27,6 +27,10 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 
+import io
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import base64
 # Create your views here.
 
 # logging in
@@ -396,28 +400,91 @@ def reports(request):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    # making the daily revenue chart using matplotlib
-    def dailyRevenuesChart():
-        days = []  # x-axis
-        revenues = []  # y-axis
+    # calculating data for 2 barcharts, including: number of sales and total revenues for the last 30 days
+    def dailyRevsAndSales():
+        days = []
+        revenues = []
+        sales = []
 
-        # assigning data to chart
+        # assigning days to days list (for x-axis of barcharts)
         for singleDay in daterange(monthToDate, tomorrow):
-            # assigning data to x-axis
             days.append(singleDay.strftime("%m-%d"))
 
-            # assigning data to y-axis
+            # calculating data for y-axis (sales and revenue)
             orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
             dayRevenue = 0
+            daySales = 0
+
             for order in orders:
                 dayRevenue += order.discountedTotal()
+                daySales += order.weight
+
             revenues.append(dayRevenue)
+            sales.append(daySales)
 
-        # creating the graph
-        fig, ax = plt.subplots()
+        return days, revenues, sales
 
+    # calculating data for 2 piecharts
+    # finding the top customers by revenue (last 30 days)
+    def listOfTopCustomers():
+        customers = {}
+
+        # calculating total spending by each customer in last 30 days and adding to dictionary
+        orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
+        for order in orders:
+            if order.customer.fullname() not in customers:
+                customers.update({order.customer.fullname(): order.discountedTotal()})
+            elif order.customer.fullname() in customers:
+                customers[order.customer.fullname()] += order.discountedTotal()
+
+        # sorting dict in descending order - greatest spenders first
+        sorted_customers = dict(sorted(customers.items(), key=lambda item: item[1], reverse=True))
+
+        topCustomers = {}
+        # return top 10 customers from sorted dict
+        for key in list(sorted_customers.keys())[:10]:
+            topCustomers[key] = sorted_customers[key]
+        return topCustomers
+
+
+    # finding the top products by revenue (last 30 days)
+    def listOfTopProducts():
+        products = {}
+        orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
+        for order in orders:
+            if order.product.product() not in products:
+                products.update({order.product.product(): order.discountedTotal()})
+            elif order.product.product() in products:
+                products[order.product.product()] += order.discountedTotal()
+
+        sorted_products = dict(sorted(products.items(), key=lambda item: item[1], reverse=True))
+
+        topProducts = {}
+        # return top 10 customers
+        for key in list(sorted_products.keys())[:10]:
+            topProducts[key] = sorted_products[key]
+        return topProducts
+
+    # assigning function call to variable so can pass in context to template
+    topCustomers = listOfTopCustomers()
+    topProducts = listOfTopProducts()
+
+    # generating actual chart - 2 barcharts, 2 piecharts
+    def generate_charts():
+        days, revenues, sales = dailyRevsAndSales()
+
+        topCustomersList = list(topCustomers.keys())
+        totalCustomerRevenues = list(topCustomers.values())
+
+        topProductsList = list(topProducts.keys())
+        totalProductRevenues = list(topProducts.values())
+
+        chart_images = []
+
+        # chart 1 : barchart of Daily Revenues for past 30 days
+        fig = Figure()
+        ax = fig.add_subplot()
         ax.bar(days, revenues)
-
         ax.set_title('30 Days - Daily Revenues')
         ax.set_xlabel('Date')
         ax.set_ylabel('Revenue')
@@ -429,28 +496,18 @@ def reports(request):
 
         ax.tick_params(axis='y', which='major', labelsize=6)
 
-        # saving graph as png in static folder
-        plt.savefig('static/charts/daily-revenues.png')
+        canvas = FigureCanvas(fig)
+        buffer = io.BytesIO()
+        canvas.print_png(buffer)
 
-    dailyRevenuesChart()
+        image_content = buffer.getvalue()
+        base64_image = base64.b64encode(image_content).decode('utf-8')
+        chart_images.append({'title': '30 Days - Daily Revenues', 'base64_image': base64_image})
 
-    # making the daily sales numbers chart using matplotlib
-    def dailySalesChart():
-        days = []
-        sales = []
-        for singleDay in daterange(monthToDate, tomorrow):
-            days.append(singleDay.strftime("%m-%d"))
-
-            orders = Order.objects.filter(transactionTime__range=[singleDay, singleDay + timedelta(days=1)])
-            daySales = 0
-            for order in orders:
-                daySales += order.weight
-            sales.append(daySales)
-
-        fig, ax = plt.subplots()
-
+        # chart 2 : barchart of Daily Sales (quantity) for past 30 days
+        fig = Figure()
+        ax = fig.add_subplot()
         ax.bar(days, sales)
-
         ax.set_title('30 Days - Daily Sales')
         ax.set_xlabel('Date')
         ax.set_ylabel('Sales')
@@ -462,88 +519,50 @@ def reports(request):
 
         ax.tick_params(axis='y', which='major', labelsize=6)
 
-        plt.savefig('static/charts/daily-sales.png')
+        canvas = FigureCanvas(fig)
+        buffer = io.BytesIO()
+        canvas.print_png(buffer)
 
-    dailySalesChart()
+        image_content = buffer.getvalue()
+        base64_image = base64.b64encode(image_content).decode('utf-8')
+        chart_images.append({'title': '30 Days - Daily Sales', 'base64_image': base64_image})
 
-    # finding the top customers by revenue (last 30 days)
-    def listOfTopCustomers():
-        customers = {}
+        # chart 3 : piechart of Top Customers for past 30 days
+        fig = Figure()
+        ax = fig.add_subplot()
+        ax.pie(totalCustomerRevenues, labels=topCustomersList, autopct='%1.1f%%', startangle=90)
+        ax.set_title('Top Customers By Revenue')
+        ax.axis('equal')
 
-        # calculating total spending by each customer in last 30 days and adding to dictionary
-        orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
-        for order in orders:
-            if order.customer not in customers:
-                customers.update({order.customer: order.discountedTotal()})
-            elif order.customer in customers:
-                customers[order.customer] += order.discountedTotal()
+        canvas = FigureCanvas(fig)
+        buffer = io.BytesIO()
+        canvas.print_png(buffer)
 
-        # sorting dict in descending order - greatest spenders first
-        sorted_customers = dict(sorted(customers.items(), key=lambda item: item[1], reverse=True))
+        image_content = buffer.getvalue()
+        base64_image = base64.b64encode(image_content).decode('utf-8')
+        chart_images.append({'title': 'Top Customers By Revenue', 'base64_image': base64_image})
 
-        topCustomers = {}
-        # return top 10 customers from sorted dict
-        for key in list(sorted_customers.keys())[:10]:
-            topCustomers[key] = sorted_customers[key]
-        return topCustomers
+        # chart 4 : piechart of Top Products for past 30 days
+        fig = Figure()
+        ax = fig.add_subplot()
+        ax.pie(totalProductRevenues, labels=topProductsList, autopct='%1.1f%%', startangle=90)
+        ax.set_title('Top Products By Revenue')
+        ax.axis('equal')
 
-    topCustomers = listOfTopCustomers()
+        canvas = FigureCanvas(fig)
+        buffer = io.BytesIO()
+        canvas.print_png(buffer)
 
-    # finding the top products by revenue (last 30 days)
-    def listOfTopProducts():
-        products = {}
-        orders = Order.objects.filter(transactionTime__range=[monthToDate, tomorrow])
-        for order in orders:
-            if order.product not in products:
-                products.update({order.product: order.discountedTotal()})
-            elif order.product in products:
-                products[order.product] += order.discountedTotal()
+        image_content = buffer.getvalue()
+        base64_image = base64.b64encode(image_content).decode('utf-8')
+        chart_images.append({'title': 'Top Products By Revenue', 'base64_image': base64_image})
 
-        sorted_products = dict(sorted(products.items(), key=lambda item: item[1], reverse=True))
+        return chart_images
 
-        topProducts = {}
-        # return top 10 customers
-        for key in list(sorted_products.keys())[:10]:
-            topProducts[key] = sorted_products[key]
-        return topProducts
+    # assign function call to variable, which will store charts
+    chart_images = generate_charts()
 
-    topProducts = listOfTopProducts()
-
-    # plotting a pie chart for top customers
-    def topCustomersChart():
-        # separating top customers dictionary into list of keys and values
-        # keys represent lables, values represent portion of pie
-        topCustomersList = list(topCustomers.keys())
-        totalRevenues = list(topCustomers.values())
-
-        # creating piechart using matplotlib
-        fig1, ax1 = plt.subplots()
-        ax1.pie(totalRevenues, labels=topCustomersList, autopct='%1.1f%%', startangle=90)
-        ax1.axis('equal')
-
-        plt.title('Top Customers By Revenue')
-
-        # saving piechart as png
-        plt.savefig('static/charts/top-customers.png')
-
-    topCustomersChart()
-
-    # plotting a pie chart for top products
-    def topProductsChart():
-        topProductsList = list(topProducts.keys())
-        totalRevenues = list(topProducts.values())
-
-        fig1, ax1 = plt.subplots()
-        ax1.pie(totalRevenues, labels=topProductsList, autopct='%1.1f%%', startangle=90)
-        ax1.axis('equal')
-
-        plt.title('Top Products By Revenue')
-
-        plt.savefig('static/charts/top-products.png')
-
-    topProductsChart()
-
-    context = {'dailyRevenue': dailyRevenue, 'monthlyRevenue': monthlyRevenue, 'yearlyRevenue': yearlyRevenue, 'topCustomers': topCustomers, 'topProducts':topProducts}
+    context = {'dailyRevenue': dailyRevenue, 'monthlyRevenue': monthlyRevenue, 'yearlyRevenue': yearlyRevenue, 'topCustomers': topCustomers, 'topProducts':topProducts, 'chart_images': chart_images}
     return render(request, 'reports.html', context)
 
 

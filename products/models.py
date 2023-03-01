@@ -56,11 +56,13 @@ class Customer(models.Model):
     tier = models.CharField(max_length=10, choices=TIERS, default='3')
 
     # defines a read-only attribute of the model which can then be accessed elsewhere
-    @property
+
     def fullname(self):
         return f"{self.firstname} {self.lastname}"
+
     def __str__(self):
         return f"{self.firstname} {self.lastname}"
+
     class Meta: # orders entries by firstname ASC
         ordering = ['firstname']
 class Product(models.Model):
@@ -74,6 +76,9 @@ class Product(models.Model):
     productName = models.CharField(max_length=20, null=True)
     grade = models.CharField(max_length=10, choices=GRADES, null=True)
     unitPrice = models.FloatField(null=True)
+
+    def product(self):
+        return f"{self.productName} {self.grade}"
 
     def __str__(self):
         return f"{self.productName} {self.grade}"
